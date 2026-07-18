@@ -47,7 +47,11 @@ backend/datasets/*
 .DS_Store
 Thumbs.db
 .idea/
-.vscode/
+# Keep shared run/debug config, ignore personal VS Code settings
+.vscode/*
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 
 # Disabled nested repo from create-next-app (renamed, not deleted)
 .git.disabled/
