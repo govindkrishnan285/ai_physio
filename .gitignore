@@ -1,0 +1,53 @@
+# ---- Dependencies ----
+node_modules/
+.pnp
+.pnp.js
+
+# ---- Next.js / build output ----
+.next/
+out/
+build/
+.vercel/
+*.tsbuildinfo
+next-env.d.ts
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# ---- Secrets / environment ----
+.env
+.env.local
+.env.*.local
+!.env.example
+!.env.local.example
+
+# ---- Local databases ----
+*.db
+*.sqlite
+*.sqlite3
+
+# ---- Runtime data: downloaded videos, curated clips, trained models ----
+# Never commit reference footage (copyright) or large binaries.
+backend/data/
+backend/datasets/*
+!backend/datasets/README.md
+*.keras
+*.h5
+
+# ---- Logs ----
+*.log
+
+# ---- Editor / OS ----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Disabled nested repo from create-next-app (renamed, not deleted)
+.git.disabled/
