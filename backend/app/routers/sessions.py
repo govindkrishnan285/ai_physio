@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlmodel import Session, func, select
+from sqlmodel import Session, col, func, select
 
 from ..db import get_session
 from ..models import ExerciseFeedback, JointMeasurement, RehabSession
@@ -121,6 +121,7 @@ def create_session(
 def list_sessions(
     patient_id: str = "default",
     exercise: str | None = None,
+    search: str | None = None,
     limit: int = Query(default=20, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
     session: Session = Depends(get_session),
@@ -128,6 +129,9 @@ def list_sessions(
     filters = [RehabSession.patient_id == patient_id]
     if exercise:
         filters.append(RehabSession.exercise == exercise)
+    if search and search.strip():
+        # Case-insensitive partial match for the global search box.
+        filters.append(col(RehabSession.exercise).ilike(f"%{search.strip()}%"))
 
     total = session.exec(
         select(func.count()).select_from(RehabSession).where(*filters)

@@ -212,6 +212,8 @@ function query(params: Record<string, string | number | undefined>): string {
 export interface SessionQuery {
   patientId?: string;
   exercise?: string;
+  /** Case-insensitive partial match on exercise name (global search). */
+  search?: string;
   limit?: number;
   offset?: number;
 }
@@ -258,6 +260,7 @@ export const api = {
       `/sessions${query({
         patient_id: q.patientId,
         exercise: q.exercise,
+        search: q.search,
         limit: q.limit,
         offset: q.offset,
       })}`

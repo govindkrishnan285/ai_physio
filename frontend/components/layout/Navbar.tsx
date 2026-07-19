@@ -5,10 +5,11 @@ import {
   Moon,
   Sun,
   UserCircle,
-  Search,
 } from "lucide-react";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+
+import SearchBox from "@/components/layout/SearchBox";
 
 const titles: Record<string, { title: string; subtitle: string }> = {
   "/": {
@@ -66,20 +67,7 @@ export default function Navbar() {
 
       {/* Center */}
 
-      <div className="hidden lg:flex items-center bg-slate-800/60 border border-slate-800 rounded-lg px-4 py-2 w-80">
-
-        <Search className="text-slate-500" size={16} />
-
-        {/* Form-filler browser extensions inject attributes (e.g. fdprocessedid)
-            into inputs before React hydrates, which trips a hydration mismatch.
-            The server markup is correct, so suppress the warning on this node. */}
-        <input
-          placeholder="Search patient..."
-          suppressHydrationWarning
-          className="bg-transparent outline-none text-sm text-white ml-3 w-full placeholder:text-slate-500"
-        />
-
-      </div>
+      <SearchBox />
 
       {/* Right */}
 
