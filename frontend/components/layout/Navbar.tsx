@@ -74,8 +74,13 @@ export default function Navbar() {
       <div className="flex items-center gap-3">
 
         {/* Notifications */}
+        {/* suppressHydrationWarning: form-filler extensions tag interactive
+            elements (fdprocessedid) before React hydrates — see SearchBox. */}
 
-        <button className="relative bg-slate-800/60 border border-slate-800 p-2.5 rounded-lg hover:bg-slate-800">
+        <button
+          suppressHydrationWarning
+          className="relative bg-slate-800/60 border border-slate-800 p-2.5 rounded-lg hover:bg-slate-800"
+        >
 
           <Bell size={18} />
 
@@ -87,6 +92,7 @@ export default function Navbar() {
 
         <button
           onClick={() => setDark(!dark)}
+          suppressHydrationWarning
           className="bg-slate-800/60 border border-slate-800 p-2.5 rounded-lg hover:bg-slate-800"
         >
 
