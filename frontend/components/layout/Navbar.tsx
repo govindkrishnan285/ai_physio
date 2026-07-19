@@ -70,8 +70,12 @@ export default function Navbar() {
 
         <Search className="text-slate-500" size={16} />
 
+        {/* Form-filler browser extensions inject attributes (e.g. fdprocessedid)
+            into inputs before React hydrates, which trips a hydration mismatch.
+            The server markup is correct, so suppress the warning on this node. */}
         <input
           placeholder="Search patient..."
+          suppressHydrationWarning
           className="bg-transparent outline-none text-sm text-white ml-3 w-full placeholder:text-slate-500"
         />
 
