@@ -9,6 +9,14 @@ sqlmodel==0.0.22
 psycopg[binary]==3.2.3
 python-multipart==0.0.20
 
+# --- Auth / migrations ---
+alembic==1.14.0
+# bcrypt via passlib: passlib pins <5 because 4.1 moved __about__; keep both pinned.
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
+pyjwt==2.10.1
+email-validator==2.2.0
+
 numpy==1.26.4
 opencv-python-headless==4.10.0.84
 mediapipe==0.10.18

@@ -36,8 +36,16 @@ engine = create_engine(
 
 
 def init_db() -> None:
+    """Create any missing tables.
+
+    Alembic is the source of truth for schema changes (`alembic upgrade head`).
+    This stays for first-run convenience on an empty database, but note the
+    tension: a model change picked up here lands in the database WITHOUT a
+    migration, and `alembic check` will then report drift. Add a migration for
+    every model change rather than relying on this.
+    """
     # Import models so their tables register on SQLModel.metadata before create_all.
-    from . import models  # noqa: F401
+    from . import auth_models, models  # noqa: F401
 
     SQLModel.metadata.create_all(engine)
 
