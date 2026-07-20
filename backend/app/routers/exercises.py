@@ -8,7 +8,15 @@ from ..models import Exercise, ReferenceProfile
 from ..schemas import ExerciseOut
 from ..seed import ensure_seed
 
-router = APIRouter(prefix="/exercises", tags=["exercises"])
+from ..deps import get_current_user
+
+# The exercise library is readable by any signed-in user; it holds no
+# patient data. Writes live in the training router and are gated harder.
+router = APIRouter(
+    prefix="/exercises",
+    tags=["exercises"],
+    dependencies=[Depends(get_current_user)],
+)
 
 
 def _to_out(ex: Exercise, has_profile: bool, has_reference_video: bool) -> ExerciseOut:

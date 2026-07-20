@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlmodel import Session, func, select
 
 from ..db import get_session
+from ..deps import TargetPatient
 from ..models import ExerciseFeedback, RehabSession
 from ..schemas import ReportItem, ReportsResponse
 
@@ -12,7 +13,7 @@ router = APIRouter(prefix="/reports", tags=["analytics"])
 
 @router.get("", response_model=ReportsResponse)
 def get_reports(
-    patient_id: str = "default",
+    patient: TargetPatient,
     limit: int = Query(default=20, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
     session: Session = Depends(get_session),
@@ -21,12 +22,12 @@ def get_reports(
     total = session.exec(
         select(func.count())
         .select_from(RehabSession)
-        .where(RehabSession.patient_id == patient_id)
+        .where(RehabSession.patient_profile_id == patient.id)
     ).one()
 
     rows = session.exec(
         select(RehabSession)
-        .where(RehabSession.patient_id == patient_id)
+        .where(RehabSession.patient_profile_id == patient.id)
         .order_by(RehabSession.start_time.desc())
         .offset(offset)
         .limit(limit)

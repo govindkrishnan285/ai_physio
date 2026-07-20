@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlmodel import Session, select
 
 from ..db import get_session
+from ..deps import TargetPatient
 from ..models import Exercise, RehabSession
 from ..schemas import RecommendationOut
 from ..services import recommend as rec_svc
@@ -13,14 +14,14 @@ router = APIRouter(prefix="/recommendations", tags=["recommendations"])
 
 @router.get("", response_model=list[RecommendationOut])
 def get_recommendations(
-    patient_id: str = "default", session: Session = Depends(get_session)
+    patient: TargetPatient, session: Session = Depends(get_session)
 ) -> list[RecommendationOut]:
     exercises = session.exec(select(Exercise)).all()
     ex_by_name = {e.name: e for e in exercises}
 
     sessions = session.exec(
         select(RehabSession)
-        .where(RehabSession.patient_id == patient_id)
+        .where(RehabSession.patient_profile_id == patient.id)
         .order_by(RehabSession.start_time.desc())
     ).all()
 

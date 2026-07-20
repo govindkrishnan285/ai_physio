@@ -86,6 +86,40 @@ def get_current_patient_profile(
     return profile
 
 
+def resolve_target_patient(
+    viewer: CurrentUser,
+    db: Annotated[Session, Depends(get_session)],
+    patient_id: uuid.UUID | None = None,
+) -> PatientProfile:
+    """Resolve which patient's records a request is about, and authorize it.
+
+    The single choke point for every clinical read. A patient's own profile is
+    always used and the `patient_id` query parameter is ignored for them, so a
+    patient cannot reach another patient's data by guessing an id. Therapists
+    and admins must name a patient explicitly and are checked against
+    assignment.
+    """
+    if viewer.role == Role.patient:
+        return get_current_patient_profile(viewer, db)
+
+    if patient_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="patient_id is required for therapist and admin accounts.",
+        )
+
+    patient = db.get(PatientProfile, patient_id)
+    if patient is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Patient not found."
+        )
+    assert_can_view_patient(viewer, patient, db)
+    return patient
+
+
+TargetPatient = Annotated[PatientProfile, Depends(resolve_target_patient)]
+
+
 def assert_can_view_patient(
     viewer: User, patient: PatientProfile, db: Session
 ) -> None:

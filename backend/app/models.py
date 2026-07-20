@@ -1,3 +1,4 @@
+import uuid
 from datetime import date as date_type
 from datetime import datetime, timezone
 from typing import Optional
@@ -59,8 +60,16 @@ class RehabSession(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
 
-    # --- Ownership / identity (multi-patient, therapist login ready) ---
-    patient_id: str = Field(index=True, default="default")
+    # --- Ownership / identity ---
+    # The owning patient, resolved from the caller's token. Never accepted from
+    # the request body: it previously was a client-supplied string, which let
+    # any caller read or write any patient's data.
+    #
+    # Nullable because sessions recorded before authentication existed have no
+    # owner. Those legacy rows are visible to admins only.
+    patient_profile_id: Optional[uuid.UUID] = Field(
+        default=None, foreign_key="patientprofile.id", index=True
+    )
 
     # --- What & when ---
     exercise: str = Field(index=True)  # exercise name (denormalized for reads)

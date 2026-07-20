@@ -5,7 +5,9 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlmodel import Session, col, func, select
 
+from ..auth_models import PatientProfile, Role, User
 from ..db import get_session
+from ..deps import CurrentUser, TargetPatient, assert_can_view_patient, get_current_patient_profile
 from ..models import ExerciseFeedback, JointMeasurement, RehabSession
 from ..schemas import (
     FeedbackOut,
@@ -34,7 +36,7 @@ def _parse_dt(value: str | None) -> datetime | None:
 def _summary(s: RehabSession) -> SessionSummary:
     return SessionSummary(
         id=s.id,
-        patient_id=s.patient_id,
+        patient_id=str(s.patient_profile_id) if s.patient_profile_id else None,
         exercise=s.exercise,
         date=s.date.isoformat(),
         start_time=s.start_time.isoformat(),
@@ -52,8 +54,19 @@ def _summary(s: RehabSession) -> SessionSummary:
 
 @router.post("", response_model=SessionDetail, status_code=201)
 def create_session(
-    body: SessionCreate, session: Session = Depends(get_session)
+    body: SessionCreate,
+    user: CurrentUser,
+    session: Session = Depends(get_session),
 ) -> SessionDetail:
+    # Only patients record sessions, and always against their own profile.
+    # Ownership comes from the token, never the body.
+    if user.role != Role.patient:
+        raise HTTPException(
+            status_code=403,
+            detail="Only patient accounts can record rehabilitation sessions.",
+        )
+    profile = get_current_patient_profile(user, session)
+
     start = _parse_dt(body.start_time) or datetime.now(timezone.utc)
     end = _parse_dt(body.end_time)
 
@@ -62,7 +75,7 @@ def create_session(
         calories = round((body.duration_seconds / 60.0) * KCAL_PER_MINUTE, 1)
 
     rehab = RehabSession(
-        patient_id=body.patient_id,
+        patient_profile_id=profile.id,
         exercise=body.exercise,
         exercise_id=body.exercise_id,
         date=start.date(),
@@ -119,14 +132,14 @@ def create_session(
 
 @router.get("", response_model=SessionListResponse)
 def list_sessions(
-    patient_id: str = "default",
+    patient: TargetPatient,
     exercise: str | None = None,
     search: str | None = None,
     limit: int = Query(default=20, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
     session: Session = Depends(get_session),
 ) -> SessionListResponse:
-    filters = [RehabSession.patient_id == patient_id]
+    filters = [RehabSession.patient_profile_id == patient.id]
     if exercise:
         filters.append(RehabSession.exercise == exercise)
     if search and search.strip():
@@ -153,21 +166,50 @@ def list_sessions(
     )
 
 
-@router.get("/{session_id}", response_model=SessionDetail)
-def get_session_detail(
-    session_id: int, session: Session = Depends(get_session)
-) -> SessionDetail:
-    s = session.get(RehabSession, session_id)
+def _load_authorized_session(
+    session_id: int, user: User, db: Session
+) -> RehabSession:
+    """Fetch a session the caller is allowed to see, or raise.
+
+    Returns 404 rather than 403 for sessions belonging to someone else: a 403
+    would confirm that the id exists, letting a caller enumerate the table.
+    """
+    s = db.get(RehabSession, session_id)
     if s is None:
         raise HTTPException(status_code=404, detail="Session not found")
-    return _detail(s, session)
+
+    if s.patient_profile_id is None:
+        # Legacy pre-auth row with no owner. Admins only.
+        if user.role != Role.admin:
+            raise HTTPException(status_code=404, detail="Session not found")
+        return s
+
+    owner = db.get(PatientProfile, s.patient_profile_id)
+    if owner is None:
+        raise HTTPException(status_code=404, detail="Session not found")
+    try:
+        assert_can_view_patient(user, owner, db)
+    except HTTPException:
+        raise HTTPException(status_code=404, detail="Session not found")
+    return s
+
+
+@router.get("/{session_id}", response_model=SessionDetail)
+def get_session_detail(
+    session_id: int,
+    user: CurrentUser,
+    session: Session = Depends(get_session),
+) -> SessionDetail:
+    return _detail(_load_authorized_session(session_id, user, session), session)
 
 
 @router.delete("/{session_id}", status_code=204)
-def delete_session(session_id: int, session: Session = Depends(get_session)) -> None:
-    s = session.get(RehabSession, session_id)
-    if s is None:
-        raise HTTPException(status_code=404, detail="Session not found")
+def delete_session(
+    session_id: int,
+    user: CurrentUser,
+    session: Session = Depends(get_session),
+) -> None:
+    s = _load_authorized_session(session_id, user, session)
     # Children cascade via the relationship config.
     session.delete(s)
     session.commit()

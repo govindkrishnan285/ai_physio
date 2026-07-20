@@ -130,7 +130,8 @@ class FeedbackIn(BaseModel):
 
 
 class SessionCreate(BaseModel):
-    patient_id: str = "default"
+    # No patient_id: ownership is taken from the authenticated caller. Accepting
+    # it here previously let any client write a session against any patient.
     exercise: str
     exercise_id: Optional[int] = None
     duration_seconds: int = 0
@@ -162,7 +163,8 @@ class SessionCreate(BaseModel):
 
 class SessionSummary(BaseModel):
     id: int
-    patient_id: str
+    # Owning patient profile id; null for legacy rows recorded before auth.
+    patient_id: Optional[str] = None
     exercise: str
     date: str
     start_time: str

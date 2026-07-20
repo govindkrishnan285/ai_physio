@@ -29,8 +29,23 @@ from ..services import jobs as job_svc
 from ..services import training as train_svc
 from ..services import youtube as yt_svc
 
-router = APIRouter(prefix="/exercises", tags=["training"])
-jobs_router = APIRouter(prefix="/training-jobs", tags=["training"])
+from ..deps import get_current_user, require_therapist
+
+# This router mixes reads that patients need during a live session
+# (/profile, /reference-video) with training writes. Gate at the endpoint, not
+# the router: a blanket require_therapist here would stop patients loading the
+# side-by-side reference player.
+router = APIRouter(
+    prefix="/exercises",
+    tags=["training"],
+    dependencies=[Depends(get_current_user)],
+)
+# Job status only reveals progress, so any signed-in user may poll it.
+jobs_router = APIRouter(
+    prefix="/training-jobs",
+    tags=["training"],
+    dependencies=[Depends(get_current_user)],
+)
 
 ALLOWED_VIDEO_SUFFIXES = {".mp4", ".mov", ".avi", ".mkv", ".webm", ".m4v"}
 
@@ -113,7 +128,7 @@ def get_training_job(job_id: str) -> TrainingJobOut:
     return TrainingJobOut(**job.as_dict())
 
 
-@router.post("/{exercise_id}/train-upload", response_model=JobAccepted, status_code=202)
+@router.post("/{exercise_id}/train-upload", response_model=JobAccepted, status_code=202, dependencies=[Depends(require_therapist)])
 def train_from_upload(
     exercise_id: int,
     background: BackgroundTasks,
@@ -163,7 +178,7 @@ def train_from_upload(
     return JobAccepted(job_id=job.id, status=job.status)
 
 
-@router.post("/{exercise_id}/train", response_model=JobAccepted, status_code=202)
+@router.post("/{exercise_id}/train", response_model=JobAccepted, status_code=202, dependencies=[Depends(require_therapist)])
 def train_from_youtube(
     exercise_id: int,
     body: TrainRequest,

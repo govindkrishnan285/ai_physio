@@ -12,7 +12,13 @@ from ..services import biomechanics as bio
 from ..services import comparison as cmp_svc
 from ..services import feedback as fb_svc
 
-router = APIRouter(prefix="/analyze", tags=["analysis"])
+from ..deps import get_current_user
+
+router = APIRouter(
+    prefix="/analyze",
+    tags=["analysis"],
+    dependencies=[Depends(get_current_user)],
+)
 
 
 @router.post("/rep", response_model=AnalyzeRepResponse)

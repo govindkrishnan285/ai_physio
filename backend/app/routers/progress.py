@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends
 from sqlmodel import Session, select
 
 from ..db import get_session
+from ..deps import TargetPatient
 from ..models import RehabSession
 from ..schemas import ProgressResponse
 
@@ -18,12 +19,12 @@ def _mean(values: list[float]) -> float:
 
 @router.get("", response_model=ProgressResponse)
 def get_progress(
-    patient_id: str = "default", session: Session = Depends(get_session)
+    patient: TargetPatient, session: Session = Depends(get_session)
 ) -> ProgressResponse:
     """Aggregate trends across all of a patient's sessions (chronological)."""
     sessions = session.exec(
         select(RehabSession)
-        .where(RehabSession.patient_id == patient_id)
+        .where(RehabSession.patient_profile_id == patient.id)
         .order_by(RehabSession.start_time)
     ).all()
 
