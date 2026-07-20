@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   BrainCircuit,
   CheckCircle2,
@@ -10,21 +10,28 @@ import {
   Plus,
   Trash2,
   Video,
+  Upload,
   AlertTriangle,
   ServerCrash,
 } from "lucide-react";
 
 import { api, BackendExercise, TrainResult } from "@/lib/api";
 
+type TrainMode = "upload" | "youtube";
+
 export default function ReferenceTrainingPage() {
   const [exercises, setExercises] = useState<BackendExercise[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [mode, setMode] = useState<TrainMode>("upload");
+  const [files, setFiles] = useState<File[]>([]);
+  const [dragging, setDragging] = useState(false);
   const [urls, setUrls] = useState<string[]>([""]);
   const [trainTf, setTrainTf] = useState(false);
   const [training, setTraining] = useState(false);
   const [result, setResult] = useState<TrainResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [backendUp, setBackendUp] = useState<boolean | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     let active = true;
@@ -47,23 +54,49 @@ export default function ReferenceTrainingPage() {
 
   const selected = exercises.find((e) => e.id === selectedId) ?? null;
 
-  async function handleTrain() {
-    if (selectedId === null) return;
-    const cleaned = urls.map((u) => u.trim()).filter(Boolean);
-    if (cleaned.length === 0) {
-      setError("Add at least one reference video URL.");
+  function addFiles(incoming: FileList | null) {
+    if (!incoming) return;
+    const vids = Array.from(incoming).filter(
+      (f) => f.type.startsWith("video/") || /\.(mp4|mov|avi|mkv|webm|m4v)$/i.test(f.name)
+    );
+    if (vids.length === 0) {
+      setError("Those files aren't videos. Use mp4, mov, avi, mkv, webm or m4v.");
       return;
     }
+    setError(null);
+    setFiles((prev) => [...prev, ...vids]);
+  }
+
+  async function handleTrain() {
+    if (selectedId === null) return;
 
     setTraining(true);
     setError(null);
     setResult(null);
     try {
-      const res = await api.trainFromYoutube(selectedId, cleaned, trainTf);
+      let res: TrainResult;
+      if (mode === "upload") {
+        if (files.length === 0) {
+          setError("Add at least one video file.");
+          return;
+        }
+        res = await api.trainFromUpload(selectedId, files, trainTf);
+      } else {
+        const cleaned = urls.map((u) => u.trim()).filter(Boolean);
+        if (cleaned.length === 0) {
+          setError("Add at least one reference video URL.");
+          return;
+        }
+        res = await api.trainFromYoutube(selectedId, cleaned, trainTf);
+      }
+
       setResult(res);
+      setFiles([]);
       setExercises((prev) =>
         prev.map((e) =>
-          e.id === selectedId ? { ...e, has_profile: true } : e
+          e.id === selectedId
+            ? { ...e, has_profile: true, has_reference_video: true }
+            : e
         )
       );
     } catch (e) {
@@ -188,11 +221,114 @@ export default function ReferenceTrainingPage() {
         </div>
       </div>
 
-      {/* URL inputs */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-3">
-        <label className="text-sm text-slate-400">Reference video URLs</label>
+      {/* Source: upload (preferred) or YouTube */}
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              setMode("upload");
+              setError(null);
+            }}
+            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+              mode === "upload"
+                ? "bg-teal-700 text-white"
+                : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+            }`}
+          >
+            Upload videos
+          </button>
+          <button
+            onClick={() => {
+              setMode("youtube");
+              setError(null);
+            }}
+            className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+              mode === "youtube"
+                ? "bg-teal-700 text-white"
+                : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+            }`}
+          >
+            YouTube URL
+          </button>
+        </div>
 
-        {urls.map((url, i) => (
+        {mode === "upload" ? (
+          <div className="space-y-3">
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                setDragging(true);
+              }}
+              onDragLeave={() => setDragging(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setDragging(false);
+                addFiles(e.dataTransfer.files);
+              }}
+              onClick={() => fileInputRef.current?.click()}
+              className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-6 py-10 text-center transition ${
+                dragging
+                  ? "border-teal-600 bg-teal-500/10"
+                  : "border-slate-700 bg-slate-800/40 hover:border-slate-600"
+              }`}
+            >
+              <Upload size={26} className="text-teal-400" />
+              <p className="text-sm font-medium text-white">
+                Drop exercise videos here, or click to browse
+              </p>
+              <p className="text-xs text-slate-500">
+                mp4 · mov · avi · mkv · webm — your own recordings, so the
+                reference clip can ship with the app
+              </p>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="video/*"
+                multiple
+                hidden
+                onChange={(e) => {
+                  addFiles(e.target.files);
+                  e.target.value = "";
+                }}
+              />
+            </div>
+
+            {files.length > 0 && (
+              <div className="space-y-2">
+                {files.map((f, i) => (
+                  <div
+                    key={`${f.name}-${i}`}
+                    className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-800/60 px-3 py-2"
+                  >
+                    <Film size={15} className="shrink-0 text-teal-400" />
+                    <span className="flex-1 truncate text-sm text-slate-200">
+                      {f.name}
+                    </span>
+                    <span className="shrink-0 text-xs text-slate-500">
+                      {(f.size / 1024 / 1024).toFixed(1)} MB
+                    </span>
+                    <button
+                      onClick={() =>
+                        setFiles((prev) => prev.filter((_, j) => j !== i))
+                      }
+                      className="shrink-0 p-1 text-slate-500 hover:text-rose-400"
+                      aria-label={`Remove ${f.name}`}
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <p className="flex items-start gap-2 text-xs text-amber-500/90">
+              <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+              Downloaded clips stay copyrighted, so they can&apos;t be shipped as
+              the side-by-side reference. Uploading your own footage is preferred.
+            </p>
+            {urls.map((url, i) => (
           <div key={i} className="flex items-center gap-2">
             <Video size={18} className="text-rose-400 shrink-0" />
             <input
@@ -218,12 +354,14 @@ export default function ReferenceTrainingPage() {
           </div>
         ))}
 
-        <button
-          onClick={() => setUrls((prev) => [...prev, ""])}
-          className="flex items-center gap-2 text-sm text-teal-400 hover:text-teal-300"
-        >
-          <Plus size={16} /> Add another video
-        </button>
+            <button
+              onClick={() => setUrls((prev) => [...prev, ""])}
+              className="flex items-center gap-2 text-sm text-teal-400 hover:text-teal-300"
+            >
+              <Plus size={16} /> Add another video
+            </button>
+          </div>
+        )}
 
         <label className="flex items-center gap-2 text-sm text-slate-400 pt-2">
           <input

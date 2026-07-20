@@ -243,6 +243,34 @@ export const api = {
     });
   },
 
+  // Preferred training path: your own footage, so the reference clip can ship
+  // with the app. FormData must not set Content-Type — the browser adds the
+  // multipart boundary itself.
+  async trainFromUpload(
+    exerciseId: number,
+    files: File[],
+    trainTf = false
+  ): Promise<TrainResult> {
+    const form = new FormData();
+    files.forEach((f) => form.append("files", f));
+    form.append("train_tf", String(trainTf));
+
+    const res = await fetch(`${API_BASE}/exercises/${exerciseId}/train-upload`, {
+      method: "POST",
+      body: form,
+    });
+    if (!res.ok) {
+      let detail = res.statusText;
+      try {
+        detail = (await res.json()).detail ?? detail;
+      } catch {
+        // non-JSON error body
+      }
+      throw new Error(detail);
+    }
+    return res.json() as Promise<TrainResult>;
+  },
+
   async analyzeRep(
     exerciseId: number,
     frames: number[][][],
