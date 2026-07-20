@@ -28,6 +28,8 @@ export default function ReferenceTrainingPage() {
   const [urls, setUrls] = useState<string[]>([""]);
   const [trainTf, setTrainTf] = useState(false);
   const [training, setTraining] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [stage, setStage] = useState("");
   const [result, setResult] = useState<TrainResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [backendUp, setBackendUp] = useState<boolean | null>(null);
@@ -73,22 +75,31 @@ export default function ReferenceTrainingPage() {
     setTraining(true);
     setError(null);
     setResult(null);
+    setProgress(0);
+    setStage("Uploading…");
     try {
-      let res: TrainResult;
+      let accepted;
       if (mode === "upload") {
         if (files.length === 0) {
           setError("Add at least one video file.");
           return;
         }
-        res = await api.trainFromUpload(selectedId, files, trainTf);
+        accepted = await api.trainFromUpload(selectedId, files, trainTf);
       } else {
         const cleaned = urls.map((u) => u.trim()).filter(Boolean);
         if (cleaned.length === 0) {
           setError("Add at least one reference video URL.");
           return;
         }
-        res = await api.trainFromYoutube(selectedId, cleaned, trainTf);
+        setStage("Downloading video…");
+        accepted = await api.trainFromYoutube(selectedId, cleaned, trainTf);
       }
+
+      // Training runs in the background; follow its progress.
+      const res = await api.waitForTrainingJob(accepted.job_id, (job) => {
+        setProgress(job.progress);
+        setStage(job.message);
+      });
 
       setResult(res);
       setFiles([]);
@@ -397,6 +408,29 @@ export default function ReferenceTrainingPage() {
         </div>
       )}
 
+      {/* Live training progress */}
+      {training && (
+        <div className="rounded-xl border border-slate-800 bg-slate-900 p-4">
+          <div className="mb-2 flex items-center justify-between text-sm">
+            <span className="flex items-center gap-2 text-slate-300">
+              <Loader2 size={15} className="animate-spin text-teal-400" />
+              {stage || "Working…"}
+            </span>
+            <span className="font-semibold text-white">{progress}%</span>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-slate-800">
+            <div
+              className="h-2 rounded-full bg-teal-500 transition-all duration-500"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <p className="mt-2 text-xs text-slate-500">
+            Training runs on the server — you can keep this tab open; pose
+            analysis is the slow part.
+          </p>
+        </div>
+      )}
+
       <button
         onClick={handleTrain}
         disabled={training || selectedId === null}
@@ -405,7 +439,7 @@ export default function ReferenceTrainingPage() {
         {training ? (
           <>
             <Loader2 size={18} className="animate-spin" />
-            Downloading &amp; learning… (this can take a few minutes)
+            Training… {progress}%
           </>
         ) : (
           <>

@@ -42,6 +42,25 @@ class TrainResult(BaseModel):
     message: str
 
 
+class JobAccepted(BaseModel):
+    """Returned immediately when training is enqueued."""
+
+    job_id: str
+    status: str
+
+
+class TrainingJobOut(BaseModel):
+    job_id: str
+    exercise_id: int
+    status: str  # queued | running | done | failed
+    progress: int
+    message: str
+    result: Optional[dict] = None
+    error: Optional[str] = None
+    created_at: str
+    updated_at: str
+
+
 class ProfileOut(BaseModel):
     exercise_id: int
     n_reps: int

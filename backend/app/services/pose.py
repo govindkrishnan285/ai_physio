@@ -11,6 +11,7 @@ services unit-tested) without MediaPipe/OpenCV present.
 from __future__ import annotations
 
 import urllib.request
+from collections.abc import Callable
 from pathlib import Path
 
 import numpy as np
@@ -43,6 +44,7 @@ def extract_pose_from_video(
     max_frames: int = 900,
     min_detection_confidence: float = 0.5,
     model: str = DEFAULT_MODEL,
+    progress: Callable[[float], None] | None = None,
 ) -> tuple[list[np.ndarray], float]:
     """Return (frames, fps).
 
@@ -50,6 +52,9 @@ def extract_pose_from_video(
     image coordinates. Frames with no detected pose are skipped. If the video
     has more frames than ``max_frames`` (and max_frames > 0), frames are
     uniformly subsampled so timing/velocity stay proportionally correct.
+
+    ``progress`` receives a 0..1 fraction as decoding advances, for job
+    progress reporting on long clips.
     """
     import cv2
     import mediapipe as mp
@@ -102,8 +107,14 @@ def extract_pose_from_video(
                             dtype=np.float64,
                         )
                         frames.append(lm)
+
+                    if progress and total > 0 and idx % 15 == 0:
+                        progress(min(1.0, idx / total))
                 idx += 1
     finally:
         cap.release()
+
+    if progress:
+        progress(1.0)
 
     return frames, float(fps)

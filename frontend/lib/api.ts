@@ -173,6 +173,23 @@ export interface ReportsResponse {
   total: number;
 }
 
+export interface JobAccepted {
+  job_id: string;
+  status: string;
+}
+
+export interface TrainingJob {
+  job_id: string;
+  exercise_id: number;
+  status: "queued" | "running" | "done" | "failed";
+  progress: number;
+  message: string;
+  result: TrainResult | null;
+  error: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ReferenceVideo {
   exercise_id: number;
   url: string; // absolute
@@ -236,7 +253,7 @@ export const api = {
     exerciseId: number,
     youtubeUrls: string[],
     trainTf = false
-  ): Promise<TrainResult> {
+  ): Promise<JobAccepted> {
     return request(`/exercises/${exerciseId}/train`, {
       method: "POST",
       body: JSON.stringify({ youtube_urls: youtubeUrls, train_tf: trainTf }),
@@ -250,7 +267,7 @@ export const api = {
     exerciseId: number,
     files: File[],
     trainTf = false
-  ): Promise<TrainResult> {
+  ): Promise<JobAccepted> {
     const form = new FormData();
     files.forEach((f) => form.append("files", f));
     form.append("train_tf", String(trainTf));
@@ -268,7 +285,31 @@ export const api = {
       }
       throw new Error(detail);
     }
-    return res.json() as Promise<TrainResult>;
+    return res.json() as Promise<JobAccepted>;
+  },
+
+  async getTrainingJob(jobId: string): Promise<TrainingJob> {
+    return request(`/training-jobs/${jobId}`);
+  },
+
+  /** Polls a training job until it finishes, reporting progress along the way. */
+  async waitForTrainingJob(
+    jobId: string,
+    onProgress?: (job: TrainingJob) => void,
+    intervalMs = 1500
+  ): Promise<TrainResult> {
+    for (;;) {
+      const job = await this.getTrainingJob(jobId);
+      onProgress?.(job);
+      if (job.status === "done") {
+        if (!job.result) throw new Error("Training finished without a result.");
+        return job.result;
+      }
+      if (job.status === "failed") {
+        throw new Error(job.error ?? "Training failed.");
+      }
+      await new Promise((r) => setTimeout(r, intervalMs));
+    }
   },
 
   async analyzeRep(

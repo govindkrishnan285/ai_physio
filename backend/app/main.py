@@ -42,6 +42,7 @@ app.add_middleware(
 
 app.include_router(exercises.router)
 app.include_router(videos.router)
+app.include_router(videos.jobs_router)
 app.include_router(analysis.router)
 app.include_router(sessions.router)
 app.include_router(progress.router)

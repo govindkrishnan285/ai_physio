@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import shutil
 import uuid
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -46,15 +47,30 @@ def train_exercise_from_paths(
     *,
     source: str,
     train_tf: bool = False,
+    progress: Callable[[int, str], None] | None = None,
 ) -> TrainingOutcome:
+    """``progress`` receives (percent 0-100, human-readable stage)."""
     settings = get_settings()
+
+    def report(pct: int, msg: str) -> None:
+        if progress:
+            progress(pct, msg)
 
     matrices = []
     reference_clip: tuple[Path, float, float] | None = None
+    n = max(1, len(paths))
 
-    for path in paths:
+    # Pose estimation dominates the runtime, so it owns most of the bar (5-75%).
+    for i, path in enumerate(paths):
+        report(5 + int(70 * i / n), f"Analyzing video {i + 1} of {n}…")
+
         frames, fps = pose_svc.extract_pose_from_video(
-            str(path), max_frames=settings.max_frames_per_video
+            str(path),
+            max_frames=settings.max_frames_per_video,
+            progress=lambda frac, i=i: report(
+                5 + int(70 * (i + frac) / n),
+                f"Analyzing video {i + 1} of {n}… {int(frac * 100)}%",
+            ),
         )
         if len(frames) < ref_svc.MIN_REP_FRAMES:
             continue
@@ -73,6 +89,7 @@ def train_exercise_from_paths(
             "visible and well lit throughout the clip."
         )
 
+    report(78, "Building movement template…")
     profile = ref_svc.build_profile(
         matrices,
         primary_joint=exercise.primary_joint,
@@ -98,6 +115,7 @@ def train_exercise_from_paths(
         from . import mlmodel
 
         if mlmodel.is_available():
+            report(88, "Training TensorFlow autoencoder…")
             model_dir = settings.data_path / "models"
             model_dir.mkdir(parents=True, exist_ok=True)
             ml_model_path = str(model_dir / f"ex_{exercise.id}.keras")
@@ -106,6 +124,7 @@ def train_exercise_from_paths(
             )
             tf_trained = True
 
+    report(95, "Saving profile…")
     session.exec(
         delete(ReferenceProfile).where(ReferenceProfile.exercise_id == exercise.id)
     )
