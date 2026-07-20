@@ -176,7 +176,14 @@ export function PoseProvider({ children }: { children: React.ReactNode }) {
     }
     m /= 4;
     const inst = Math.max(0, 1 - m * 12);
-    setStability((s) => s * 0.7 + inst * 0.3);
+    // An EMA in float never reaches an exact fixed point, so an unguarded
+    // update changed `stability` on every frame -> new calibration memo ->
+    // degraded effect, forever. Settle once the step is below display
+    // resolution so React can bail out.
+    setStability((s) => {
+      const next = s * 0.7 + inst * 0.3;
+      return Math.abs(next - s) < 0.005 ? s : next;
+    });
   }, [pose.landmarks, cameraOn]);
 
   // Auto-advance calibrating -> active once quality holds above threshold.

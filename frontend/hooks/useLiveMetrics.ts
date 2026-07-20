@@ -100,7 +100,7 @@ export function useLiveMetrics({
   // Phase + stability update loop (driven by the pose frame rate).
   useEffect(() => {
     if (!running || primaryAngle === null) {
-      setPhase(running ? "Start" : "Start");
+      setPhase("Start");
       prevAngleRef.current = null;
       velWindowRef.current = [];
       setStability(0);

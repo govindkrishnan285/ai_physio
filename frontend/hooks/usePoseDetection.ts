@@ -158,14 +158,22 @@ export function usePoseDetection(
           });
         } else {
           stabilizer.current.reset();
-          setPoseState({
-            landmarks: null,
-            worldLandmarks: null,
-            fps: Math.round(fps),
-            isTracking: false,
-            confidence: 0,
-            poseCount: 0,
-          });
+          // Once untracked, stay on the same state object. Re-allocating it
+          // every commit re-rendered the whole app ~15x/sec for as long as
+          // nobody was in frame. Cost: the fps readout freezes while
+          // untracked, which is the more honest reading anyway.
+          setPoseState((prev) =>
+            !prev.isTracking && prev.landmarks === null
+              ? prev
+              : {
+                  landmarks: null,
+                  worldLandmarks: null,
+                  fps: Math.round(fps),
+                  isTracking: false,
+                  confidence: 0,
+                  poseCount: 0,
+                }
+          );
         }
       }
 

@@ -112,12 +112,21 @@ export function useRepCounter(
       }
     }
 
-    setState((prev) => ({
-      ...prev,
-      phase: phase.current,
-      currentAngle: angle,
-      peakAngleThisRep: peakAngle.current,
-    }));
+    // Returning `prev` unchanged lets React bail out of the re-render. Without
+    // this the per-frame effect allocated a new state object ~15x/sec, which
+    // invalidated the PoseContext value memo and re-rendered every consumer.
+    setState((prev) =>
+      prev.phase === phase.current &&
+      prev.currentAngle === angle &&
+      prev.peakAngleThisRep === peakAngle.current
+        ? prev
+        : {
+            ...prev,
+            phase: phase.current,
+            currentAngle: angle,
+            peakAngleThisRep: peakAngle.current,
+          }
+    );
   }, [angles, active, exercise]);
 
   return state;
