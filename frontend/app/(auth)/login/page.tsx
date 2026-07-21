@@ -4,6 +4,13 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 
+import {
+  ERROR_BOX,
+  FIELD,
+  LABEL,
+  LINK,
+  PRIMARY_BUTTON,
+} from "@/components/auth/formStyles";
 import { useAuth } from "@/context/AuthContext";
 
 function LoginForm() {
@@ -33,9 +40,16 @@ function LoginForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} className="space-y-5">
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <h2 className="text-lg font-semibold text-white">Welcome back</h2>
+        <p className="mt-1 text-sm text-slate-400">
+          Sign in to continue your rehabilitation.
+        </p>
+      </div>
+
+      <div>
+        <label htmlFor="email" className={LABEL}>
           Email
         </label>
         <input
@@ -43,18 +57,19 @@ function LoginForm() {
           type="email"
           required
           autoComplete="email"
+          placeholder="you@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+          className={FIELD}
         />
       </div>
 
       <div>
         <div className="flex items-center justify-between">
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label htmlFor="password" className={LABEL}>
             Password
           </label>
-          <Link href="/forgot-password" className="text-xs text-blue-600 hover:underline dark:text-blue-400">
+          <Link href="/forgot-password" className={`text-xs ${LINK}`}>
             Forgot password?
           </Link>
         </div>
@@ -63,29 +78,26 @@ function LoginForm() {
           type="password"
           required
           autoComplete="current-password"
+          placeholder="••••••••"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+          className={FIELD}
         />
       </div>
 
       {error && (
-        <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+        <p role="alert" className={ERROR_BOX}>
           {error}
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={busy}
-        className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-      >
+      <button type="submit" disabled={busy} className={PRIMARY_BUTTON}>
         {busy ? "Signing in…" : "Sign in"}
       </button>
 
-      <p className="text-center text-sm text-gray-600 dark:text-gray-400">
+      <p className="text-center text-sm text-slate-400">
         No account?{" "}
-        <Link href="/register" className="text-blue-600 hover:underline dark:text-blue-400">
+        <Link href="/register" className={LINK}>
           Create one
         </Link>
       </p>
@@ -97,7 +109,9 @@ export default function LoginPage() {
   // useSearchParams needs a Suspense boundary to avoid opting the whole route
   // into client-side rendering.
   return (
-    <Suspense fallback={<div className="text-sm text-gray-500">Loading…</div>}>
+    <Suspense
+      fallback={<div className="text-sm text-slate-500">Loading…</div>}
+    >
       <LoginForm />
     </Suspense>
   );

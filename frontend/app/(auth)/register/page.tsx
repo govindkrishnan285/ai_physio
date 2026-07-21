@@ -3,11 +3,16 @@
 import Link from "next/link";
 import { useState } from "react";
 
+import {
+  ERROR_BOX,
+  FIELD,
+  HINT,
+  LABEL,
+  LINK,
+  PRIMARY_BUTTON,
+} from "@/components/auth/formStyles";
 import { useAuth } from "@/context/AuthContext";
 import { api, Role } from "@/lib/api";
-
-const FIELD =
-  "mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100";
 
 export default function RegisterPage() {
   const { signIn } = useAuth();
@@ -31,21 +36,31 @@ export default function RegisterPage() {
       // required to use the app yet, so sign straight in.
       await signIn(email, password);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not create the account.");
+      setError(
+        err instanceof Error ? err.message : "Could not create the account."
+      );
       setBusy(false);
     }
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    <form onSubmit={onSubmit} className="space-y-5">
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <h2 className="text-lg font-semibold text-white">Create your account</h2>
+        <p className="mt-1 text-sm text-slate-400">
+          Start tracking your recovery in real time.
+        </p>
+      </div>
+
+      <div>
+        <label htmlFor="name" className={LABEL}>
           Full name
         </label>
         <input
           id="name"
           required
           autoComplete="name"
+          placeholder="Jane Doe"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
           className={FIELD}
@@ -53,7 +68,7 @@ export default function RegisterPage() {
       </div>
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label htmlFor="email" className={LABEL}>
           Email
         </label>
         <input
@@ -61,6 +76,7 @@ export default function RegisterPage() {
           type="email"
           required
           autoComplete="email"
+          placeholder="you@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className={FIELD}
@@ -68,7 +84,7 @@ export default function RegisterPage() {
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label htmlFor="password" className={LABEL}>
           Password
         </label>
         <input
@@ -77,17 +93,18 @@ export default function RegisterPage() {
           required
           minLength={8}
           autoComplete="new-password"
+          placeholder="••••••••"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className={FIELD}
         />
-        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+        <p className={HINT}>
           At least 8 characters, mixing letters with digits or symbols.
         </p>
       </div>
 
       <div>
-        <label htmlFor="role" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label htmlFor="role" className={LABEL}>
           I am a
         </label>
         <select
@@ -102,22 +119,18 @@ export default function RegisterPage() {
       </div>
 
       {error && (
-        <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+        <p role="alert" className={ERROR_BOX}>
           {error}
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={busy}
-        className="w-full rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-      >
+      <button type="submit" disabled={busy} className={PRIMARY_BUTTON}>
         {busy ? "Creating account…" : "Create account"}
       </button>
 
-      <p className="text-center text-sm text-gray-600 dark:text-gray-400">
+      <p className="text-center text-sm text-slate-400">
         Already registered?{" "}
-        <Link href="/login" className="text-blue-600 hover:underline dark:text-blue-400">
+        <Link href="/login" className={LINK}>
           Sign in
         </Link>
       </p>

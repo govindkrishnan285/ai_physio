@@ -4,6 +4,14 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 
+import {
+  ERROR_BOX,
+  FIELD,
+  HINT,
+  LABEL,
+  LINK,
+  PRIMARY_BUTTON,
+} from "@/components/auth/formStyles";
 import { api } from "@/lib/api";
 
 function VerifyInner() {
@@ -29,17 +37,17 @@ function VerifyInner() {
   return (
     <div className="space-y-4 text-sm">
       {state === "working" && (
-        <p className="text-gray-600 dark:text-gray-400">Verifying your email…</p>
+        <p className="text-slate-400">Verifying your email…</p>
       )}
       {state === "ok" && (
-        <p className="text-green-700 dark:text-green-400">
+        <p className="text-teal-300">
           Email verified. Your account is now active.
         </p>
       )}
       {state === "failed" && (
-        <p className="text-red-700 dark:text-red-300">{message}</p>
+        <p className="text-red-300">{message}</p>
       )}
-      <Link href="/login" className="inline-block text-blue-600 hover:underline dark:text-blue-400">
+      <Link href="/login" className={`inline-block ${LINK}`}>
         Continue to sign in
       </Link>
     </div>
@@ -48,7 +56,7 @@ function VerifyInner() {
 
 export default function VerifyEmailPage() {
   return (
-    <Suspense fallback={<div className="text-sm text-gray-500">Loading…</div>}>
+    <Suspense fallback={<div className="text-sm text-slate-500">Loading…</div>}>
       <VerifyInner />
     </Suspense>
   );
