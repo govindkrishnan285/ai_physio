@@ -1,8 +1,27 @@
 // Client for the FastAPI backend. PostgreSQL is the single source of truth for
-// all rehabilitation data — nothing here reads or writes localStorage.
+// all rehabilitation data — the only thing stored client-side is the auth token
+// (see lib/authStore.ts).
+
+import {
+  clearTokens,
+  getAccessToken,
+  getRefreshToken,
+  setTokens,
+} from "./authStore";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") || "http://localhost:8000";
+
+/** Thrown when the server rejects the request; carries the HTTP status. */
+export class ApiError extends Error {
+  constructor(
+    message: string,
+    readonly status: number
+  ) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Types
@@ -76,8 +95,50 @@ export interface FeedbackEntry {
   severity: string;
 }
 
+export type Role = "patient" | "therapist" | "admin";
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  full_name: string;
+  role: Role;
+  is_active: boolean;
+  is_verified: boolean;
+  created_at: string;
+  last_login_at: string | null;
+}
+
+export interface PatientProfile {
+  id: string;
+  user_id: string;
+  therapist_id: string | null;
+  date_of_birth: string | null;
+  phone: string;
+  gender: string;
+  injury_type: string;
+  injury_date: string | null;
+  injury_notes: string;
+  recovery_stage: string;
+  current_program: Record<string, unknown>;
+}
+
+export interface TherapistProfile {
+  id: string;
+  user_id: string;
+  specialization: string;
+  license_number: string;
+  years_experience: number | null;
+  bio: string;
+}
+
+export interface MeResponse {
+  user: AuthUser;
+  patient_profile: PatientProfile | null;
+  therapist_profile: TherapistProfile | null;
+}
+
 export interface SessionCreateInput {
-  patient_id?: string;
+  // No patient_id: the backend derives ownership from the access token.
   exercise: string;
   exercise_id?: number | null;
   duration_seconds: number;
@@ -200,20 +261,80 @@ export interface ReferenceVideo {
 // ---------------------------------------------------------------------------
 // Fetch helper
 // ---------------------------------------------------------------------------
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
+/** Endpoints that must not carry a token or trigger a refresh. */
+const PUBLIC_PATHS = ["/auth/login", "/auth/register", "/auth/refresh", "/health"];
+
+// A single in-flight refresh shared by all callers. Without this, a page that
+// fires several requests at once would kick off one refresh each, and the
+// losers would install a token the backend had already rotated past.
+let refreshInFlight: Promise<boolean> | null = null;
+
+async function refreshAccessToken(): Promise<boolean> {
+  const refresh = getRefreshToken();
+  if (!refresh) return false;
+
+  const res = await fetch(`${API_BASE}/auth/refresh`, {
+    method: "POST",
     headers: { "Content-Type": "application/json" },
-    ...init,
+    body: JSON.stringify({ refresh_token: refresh }),
   });
+  if (!res.ok) {
+    clearTokens();
+    return false;
+  }
+  const body = await res.json();
+  setTokens(body.access_token, body.refresh_token);
+  return true;
+}
+
+function ensureRefresh(): Promise<boolean> {
+  refreshInFlight ??= refreshAccessToken().finally(() => {
+    refreshInFlight = null;
+  });
+  return refreshInFlight;
+}
+
+async function send(path: string, init?: RequestInit): Promise<Response> {
+  const token = getAccessToken();
+  const headers = new Headers(init?.headers);
+  // FormData sets its own multipart boundary; forcing JSON here would corrupt
+  // video uploads.
+  if (!(init?.body instanceof FormData) && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
+  if (token && !PUBLIC_PATHS.some((p) => path.startsWith(p))) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+  return fetch(`${API_BASE}${path}`, { ...init, headers });
+}
+
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  let res = await send(path, init);
+
+  // Access tokens expire after 30 minutes. Refresh once and retry, so an
+  // expiry mid-session doesn't surface to the user at all.
+  if (res.status === 401 && !PUBLIC_PATHS.some((p) => path.startsWith(p))) {
+    if (await ensureRefresh()) {
+      res = await send(path, init);
+    } else {
+      clearTokens();
+    }
+  }
+
   if (!res.ok) {
     let detail = res.statusText;
     try {
       const body = await res.json();
-      detail = body.detail ?? detail;
+      // FastAPI validation errors arrive as a list of objects, not a string.
+      if (typeof body.detail === "string") {
+        detail = body.detail;
+      } else if (Array.isArray(body.detail) && body.detail.length > 0) {
+        detail = body.detail[0]?.msg ?? detail;
+      }
     } catch {
       // non-JSON error body; keep statusText
     }
-    throw new Error(detail);
+    throw new ApiError(detail, res.status);
   }
   if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
@@ -247,6 +368,58 @@ export const api = {
 
   async listExercises(): Promise<BackendExercise[]> {
     return request("/exercises");
+  },
+
+  // --- Auth ---
+  async register(input: {
+    email: string;
+    password: string;
+    full_name: string;
+    role: Role;
+  }): Promise<AuthUser> {
+    return request("/auth/register", {
+      method: "POST",
+      body: JSON.stringify(input),
+    });
+  },
+
+  /** Signs in and installs the tokens; callers just await it. */
+  async login(email: string, password: string): Promise<void> {
+    const pair = await request<{ access_token: string; refresh_token: string }>(
+      "/auth/login",
+      { method: "POST", body: JSON.stringify({ email, password }) }
+    );
+    setTokens(pair.access_token, pair.refresh_token);
+  },
+
+  logout(): void {
+    // Tokens are stateless, so there is nothing to revoke server-side yet.
+    clearTokens();
+  },
+
+  async me(): Promise<MeResponse> {
+    return request("/auth/me");
+  },
+
+  async forgotPassword(email: string): Promise<{ detail: string }> {
+    return request("/auth/forgot-password", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    });
+  },
+
+  async resetPassword(token: string, password: string): Promise<{ detail: string }> {
+    return request("/auth/reset-password", {
+      method: "POST",
+      body: JSON.stringify({ token, password }),
+    });
+  },
+
+  async verifyEmail(token: string): Promise<AuthUser> {
+    return request("/auth/verify-email", {
+      method: "POST",
+      body: JSON.stringify({ token }),
+    });
   },
 
   async trainFromYoutube(
@@ -351,7 +524,7 @@ export const api = {
     await request<void>(`/sessions/${id}`, { method: "DELETE" });
   },
 
-  async getProgress(patientId = "default"): Promise<ProgressResponse> {
+  async getProgress(patientId?: string): Promise<ProgressResponse> {
     return request(`/progress${query({ patient_id: patientId })}`);
   },
 
@@ -365,7 +538,7 @@ export const api = {
     );
   },
 
-  async getRecommendations(patientId = "default"): Promise<Recommendation[]> {
+  async getRecommendations(patientId?: string): Promise<Recommendation[]> {
     return request(`/recommendations${query({ patient_id: patientId })}`);
   },
 

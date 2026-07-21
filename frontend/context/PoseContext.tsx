@@ -323,7 +323,6 @@ export function PoseProvider({ children }: { children: React.ReactNode }) {
     }
 
     return {
-      patient_id: "default",
       exercise: selectedExercise.name,
       exercise_id: server.backendExerciseId,
       duration_seconds: elapsedSec,

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+import { AuthProvider } from "@/context/AuthContext";
 import { PoseProvider } from "@/context/PoseContext";
 
 const geistSans = Geist({
@@ -31,8 +32,12 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-slate-950 text-slate-100">
-        {/* Session state is shared across both modes so a session survives navigation. */}
-        <PoseProvider>{children}</PoseProvider>
+        {/* Auth wraps pose: the pose layer calls authenticated endpoints, so the
+            session has to resolve first. */}
+        <AuthProvider>
+          {/* Session state is shared across both modes so a session survives navigation. */}
+          <PoseProvider>{children}</PoseProvider>
+        </AuthProvider>
       </body>
     </html>
   );

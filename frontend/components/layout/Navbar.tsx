@@ -2,6 +2,7 @@
 
 import {
   Bell,
+  LogOut,
   Moon,
   Sun,
   UserCircle,
@@ -10,6 +11,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 
 import SearchBox from "@/components/layout/SearchBox";
+import { useAuth } from "@/context/AuthContext";
 
 const titles: Record<string, { title: string; subtitle: string }> = {
   "/": {
@@ -43,6 +45,7 @@ const titles: Record<string, { title: string; subtitle: string }> = {
 };
 
 export default function Navbar() {
+  const { user, signOut } = useAuth();
   const [dark, setDark] = useState(true);
   const pathname = usePathname();
 
@@ -102,24 +105,34 @@ export default function Navbar() {
 
         {/* User */}
 
-        <div className="flex items-center gap-3 bg-slate-800/60 border border-slate-800 rounded-lg pl-3 pr-4 py-2">
+        <div className="flex items-center gap-3 bg-slate-800/60 border border-slate-800 rounded-lg pl-3 pr-2 py-2">
 
           <UserCircle
             size={28}
             className="text-teal-400"
           />
 
-          <div>
+          <div className="min-w-0">
 
-            <h2 className="text-white text-sm font-medium">
-              Govind
+            <h2 className="text-white text-sm font-medium truncate">
+              {user?.full_name || user?.email || "—"}
             </h2>
 
-            <p className="text-slate-500 text-xs">
-              Patient
+            <p className="text-slate-500 text-xs capitalize">
+              {user?.role ?? ""}
             </p>
 
           </div>
+
+          <button
+            type="button"
+            onClick={signOut}
+            title="Sign out"
+            aria-label="Sign out"
+            className="ml-1 rounded-md p-1.5 text-slate-400 transition hover:bg-slate-700/60 hover:text-white"
+          >
+            <LogOut size={18} />
+          </button>
 
         </div>
 
