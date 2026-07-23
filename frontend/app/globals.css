@@ -1,10 +1,68 @@
 @import "tailwindcss";
 
+/*
+ * "Aetheris Health" design system, ported from the Stitch export
+ * (design/stitch_ai_physio_assistant/aetheris_health/DESIGN.md).
+ * Semantic surface/primary tokens live here so every screen — dashboard,
+ * live session, reports, therapist/admin — shares one vocabulary. The default
+ * Tailwind slate/teal palette still works alongside these.
+ */
 @theme inline {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains-mono);
+
+  /* Surfaces (tonal elevation, darkest -> brightest) */
+  --color-surface: #051424;
+  --color-surface-container-lowest: #010f1f;
+  --color-surface-container-low: #0d1c2d;
+  --color-surface-container: #122131;
+  --color-surface-container-high: #1c2b3c;
+  --color-surface-container-highest: #273647;
+  --color-surface-bright: #2c3a4c;
+  --color-surface-variant: #273647;
+
+  --color-on-surface: #d4e4fa;
+  --color-on-surface-variant: #bbcac6;
+  --color-outline: #859490;
+  --color-outline-variant: #3c4947;
+
+  /* Primary (teal) + accents */
+  --color-primary: #4fdbc8;
+  --color-on-primary: #003731;
+  --color-primary-container: #14b8a6;
+  --color-tertiary: #ffb95f; /* warnings / streak */
+  --color-error: #ffb4ab;
+
+  --color-background: #051424;
+  --color-on-background: #d4e4fa;
 }
 
 body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+/*
+ * Depth is communicated with tonal layering + soft teal glows rather than
+ * heavy shadows (see DESIGN.md "Elevation & Depth").
+ */
+.glass-card {
+  background: rgba(18, 33, 49, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(60, 73, 71, 0.3);
+}
+.teal-glow {
+  box-shadow: 0 0 20px rgba(79, 219, 200, 0.1);
+}
+.active-glow {
+  box-shadow: 0 0 32px rgba(79, 219, 200, 0.15);
+}
+
+/* Monospaced, tracked caps for data labels / anatomical coordinates. */
+.label-caps {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
