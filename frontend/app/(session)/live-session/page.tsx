@@ -24,6 +24,7 @@ import {
 import { usePose } from "@/context/PoseContext";
 import { useCameras } from "@/hooks/useCameras";
 import { useLiveMetrics } from "@/hooks/useLiveMetrics";
+import { useRepFormReview } from "@/hooks/useRepFormReview";
 import { getFeedback } from "@/lib/feedbackEngine";
 import { SEVERITY_STYLE } from "@/lib/liveMetrics";
 import CameraStage from "@/components/session/CameraStage";
@@ -68,6 +69,15 @@ export default function LiveSessionPage() {
     repCounter,
     elapsedSec,
     serverFeedback,
+  });
+
+  // Per-rep form review (graded at the peak of each rep) replaces the old
+  // per-frame mistake table, which jittered and mis-scored mid-movement.
+  const { lastRep } = useRepFormReview({
+    angles,
+    exercise: selectedExercise,
+    repCounter,
+    running,
   });
 
   const feedback = getFeedback(selectedExercise, repCounter, pose, running);
@@ -334,20 +344,37 @@ export default function LiveSessionPage() {
               </div>
             </div>
 
-            {/* Detected mistakes */}
+            {/* Last-rep form review — graded at the peak, stable between reps */}
             <div className="flex min-h-0 flex-col rounded-2xl border border-slate-800 bg-slate-900 p-4">
-              <h3 className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                <AlertTriangle size={14} className="text-amber-400" /> Detected Mistakes
+              <h3 className="mb-3 flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-slate-400">
+                <span className="flex items-center gap-2">
+                  <AlertTriangle size={14} className="text-amber-400" /> Rep Form Review
+                </span>
+                {running && repCounter.phase === "working" && (
+                  <span className="flex items-center gap-1.5 text-[10px] font-medium normal-case text-teal-400">
+                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-teal-400" />
+                    Tracking rep…
+                  </span>
+                )}
+                {lastRep && (
+                  <span className="font-mono text-[10px] normal-case text-slate-500">
+                    Rep {lastRep.repNumber}
+                  </span>
+                )}
               </h3>
               <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
                 {!running ? (
                   <p className="text-sm text-slate-500">No active session.</p>
-                ) : metrics.mistakes.length === 0 ? (
+                ) : !lastRep ? (
+                  <p className="text-sm text-slate-500">
+                    Complete a rep to see your form breakdown.
+                  </p>
+                ) : lastRep.mistakes.length === 0 ? (
                   <div className="flex items-center gap-2 rounded-lg border border-emerald-800 bg-emerald-500/10 p-2.5 text-sm text-emerald-300">
-                    <CheckCircle size={15} /> Posture within acceptable range.
+                    <CheckCircle size={15} /> Clean rep — every joint within range.
                   </div>
                 ) : (
-                  metrics.mistakes.map((m) => {
+                  lastRep.mistakes.map((m) => {
                     const style = SEVERITY_STYLE[m.severity];
                     return (
                       <div
@@ -362,7 +389,7 @@ export default function LiveSessionPage() {
                           </span>
                         </div>
                         <p className="text-xs text-slate-400">
-                          Current <span className="text-slate-200">{m.current}°</span> · Optimal{" "}
+                          At peak <span className="text-slate-200">{m.current}°</span> · Target{" "}
                           <span className="text-slate-200">{m.optimal}°</span> · Δ{" "}
                           <span className={style.text}>
                             {m.diff > 0 ? "+" : ""}
