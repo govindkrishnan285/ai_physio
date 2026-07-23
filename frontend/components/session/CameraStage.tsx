@@ -78,10 +78,39 @@ export default function CameraStage({
     if (!canvas || !video) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    canvas.width = video.clientWidth;
-    canvas.height = video.clientHeight;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawSkeleton(ctx, pose.landmarks, canvas.width, canvas.height);
+
+    const elW = video.clientWidth;
+    const elH = video.clientHeight;
+    canvas.width = elW;
+    canvas.height = elH;
+    ctx.clearRect(0, 0, elW, elH);
+
+    // The feed is shown with object-contain (whole frame, letterboxed), so the
+    // video occupies only a fitted rect inside the element. Draw the skeleton
+    // into that same rect, or it drifts off the body into the black bars.
+    const vW = video.videoWidth || 16;
+    const vH = video.videoHeight || 9;
+    const videoAspect = vW / vH;
+    const elAspect = elW / elH;
+    let dispW: number, dispH: number, offX: number, offY: number;
+    if (elAspect > videoAspect) {
+      // Pillarboxed: full height, bars left/right.
+      dispH = elH;
+      dispW = elH * videoAspect;
+      offX = (elW - dispW) / 2;
+      offY = 0;
+    } else {
+      // Letterboxed: full width, bars top/bottom.
+      dispW = elW;
+      dispH = elW / videoAspect;
+      offX = 0;
+      offY = (elH - dispH) / 2;
+    }
+
+    ctx.save();
+    ctx.translate(offX, offY);
+    drawSkeleton(ctx, pose.landmarks, dispW, dispH);
+    ctx.restore();
   }, [pose.landmarks, running, webcamRef]);
 
   return (
@@ -99,7 +128,9 @@ export default function CameraStage({
             audio={false}
             videoConstraints={videoConstraints}
             screenshotFormat="image/jpeg"
-            className="absolute inset-0 h-full w-full object-cover"
+            // object-contain shows the ENTIRE captured frame (letterboxed if the
+            // stage isn't 16:9), rather than cropping it to fill.
+            className="absolute inset-0 h-full w-full object-contain"
           />
           <canvas
             ref={canvasRef}
