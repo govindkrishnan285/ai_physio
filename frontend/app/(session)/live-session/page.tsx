@@ -25,6 +25,7 @@ import { usePose } from "@/context/PoseContext";
 import { useCameras } from "@/hooks/useCameras";
 import { useLiveMetrics } from "@/hooks/useLiveMetrics";
 import { useRepFormReview } from "@/hooks/useRepFormReview";
+import { useLiveCue } from "@/hooks/useLiveCue";
 import { getFeedback } from "@/lib/feedbackEngine";
 import { SEVERITY_STYLE } from "@/lib/liveMetrics";
 import CameraStage from "@/components/session/CameraStage";
@@ -81,10 +82,23 @@ export default function LiveSessionPage() {
   });
 
   const feedback = getFeedback(selectedExercise, repCounter, pose, running);
+
+  // Real-time coaching cue for the on-camera ticker: one calm, phase-aware line
+  // (symmetry / tempo / depth). Detailed correction stays in the post-rep
+  // review, so this never turns into a mid-movement data dump.
+  const liveCue = useLiveCue({
+    angles,
+    exercise: selectedExercise,
+    phase: metrics.phase,
+    stability: metrics.stability,
+    repCounter,
+    running,
+    isTracking: pose.isTracking,
+  });
   const correctionTone =
-    feedback.correction.tone === "success"
+    liveCue.tone === "success"
       ? ("ok" as const)
-      : feedback.correction.tone === "warning"
+      : liveCue.tone === "warning"
         ? ("warning" as const)
         : ("idle" as const);
 
@@ -238,7 +252,7 @@ export default function LiveSessionPage() {
             phase={metrics.phase}
             reps={repCounter.reps}
             targetReps={metrics.targetReps}
-            correction={feedback.correction.text}
+            correction={liveCue.text}
             correctionTone={correctionTone}
           />
         </div>
