@@ -117,13 +117,22 @@ export function PoseProvider({ children }: { children: React.ReactNode }) {
     });
   }, [cameraOn, pose.landmarks, pose.poseCount, pose.confidence, frameQuality, stability, qualityThreshold, selectedExercise.focus]);
 
-  // Exercise analysis is gated: active phase, quality OK, and actually tracking.
+  // Detailed AI scoring/sampling is gated on quality: active phase AND not
+  // degraded.
   const analysisActive = sessionPhase === "active" && !degraded;
+
+  // Rep COUNTING, though, must survive momentary quality dips. Movement itself
+  // lowers the stability score, so gating reps on !degraded pauses counting
+  // during the very rep being performed — the missed-reps bug. A rep is a
+  // large, unambiguous angle excursion (and only runs when a pose is actually
+  // tracked, since `angles` is null otherwise), so it's safe to keep counting
+  // through a brief quality drop. Detailed scoring stays quality-gated above.
+  const repCountingActive = sessionPhase === "active";
 
   const repCounter = useRepCounter(
     angles,
     selectedExercise,
-    analysisActive,
+    repCountingActive,
     resetToken
   );
 

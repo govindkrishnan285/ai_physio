@@ -213,9 +213,10 @@ export default function CameraStage({
         <div className="absolute left-1/2 top-16 max-w-[70%] -translate-x-1/2 rounded-xl border border-amber-600 bg-amber-950/70 px-5 py-3 text-center backdrop-blur-md">
           <div className="flex items-center justify-center gap-2 text-amber-300">
             <AlertTriangle size={15} />
-            <p className="text-sm font-semibold">Tracking paused — quality dropped</p>
+            <p className="text-sm font-semibold">Form scoring paused — quality dropped</p>
           </div>
           <p className="mt-0.5 text-xs text-amber-100/90">
+            Reps still count.{" "}
             {calibration?.instructions[0] ?? "Reposition until tracking quality recovers."}
           </p>
         </div>
