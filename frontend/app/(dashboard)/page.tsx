@@ -14,6 +14,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 
+import RequireAuth from "@/components/auth/RequireAuth";
 import { useAuth } from "@/context/AuthContext";
 import { useApiData } from "@/hooks/useApiData";
 import { api } from "@/lib/api";
@@ -33,7 +34,17 @@ function firstNameOf(fullName: string | undefined, email: string | undefined) {
   return n || email?.split("@")[0] || "there";
 }
 
+// This is the patient home. Staff have their own dashboards, so route them
+// there rather than showing a patient view that would fail their scoped queries.
 export default function DashboardPage() {
+  return (
+    <RequireAuth roles={["patient"]}>
+      <PatientDashboard />
+    </RequireAuth>
+  );
+}
+
+function PatientDashboard() {
   const { user, patientProfile } = useAuth();
 
   const progress = useApiData(useCallback(() => api.getProgress(), []));

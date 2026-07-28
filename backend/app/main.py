@@ -16,6 +16,7 @@ from .routers import (
     recommendations,
     reports,
     sessions,
+    staff,
     videos,
 )
 
@@ -62,6 +63,7 @@ app.include_router(sessions.router)
 app.include_router(progress.router)
 app.include_router(reports.router)
 app.include_router(recommendations.router)
+app.include_router(staff.router)
 
 # Serve curated reference clips for the side-by-side player.
 _ref_dir = _settings.data_path / "reference-clips"

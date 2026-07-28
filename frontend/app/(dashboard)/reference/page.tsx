@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+
+import RequireAuth from "@/components/auth/RequireAuth";
 import {
   BrainCircuit,
   CheckCircle2,
@@ -19,7 +21,7 @@ import { api, BackendExercise, TrainResult } from "@/lib/api";
 
 type TrainMode = "upload" | "youtube";
 
-export default function ReferenceTrainingPage() {
+function ReferenceTrainingPageInner() {
   const [exercises, setExercises] = useState<BackendExercise[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [mode, setMode] = useState<TrainMode>("upload");
@@ -481,5 +483,16 @@ function StatusBadge({ trained, kind }: { trained: boolean; kind: "model" | "cli
       <Cpu size={11} />
       {trained ? "Model trained" : "Not trained"}
     </span>
+  );
+}
+
+// Training rebuilds the shared reference profile, so it is therapist/admin only
+// — matching the backend gate. Patients never see this in the nav; this guard
+// also blocks direct navigation to /reference.
+export default function ReferenceTrainingPage() {
+  return (
+    <RequireAuth roles={["therapist", "admin"]}>
+      <ReferenceTrainingPageInner />
+    </RequireAuth>
   );
 }

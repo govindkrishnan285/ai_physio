@@ -11,20 +11,45 @@ import {
   Settings,
   Activity,
   BrainCircuit,
+  Users,
+  ShieldCheck,
 } from "lucide-react";
 
-const menu = [
-  { title: "Dashboard", href: "/", icon: LayoutDashboard },
-  { title: "Live Session", href: "/live-session", icon: Camera },
-  { title: "Exercises", href: "/exercises", icon: Dumbbell },
-  { title: "Train Model", href: "/reference", icon: BrainCircuit },
-  { title: "Progress", href: "/progress", icon: LineChart },
-  { title: "Reports", href: "/reports", icon: ClipboardList },
-  { title: "Settings", href: "/settings", icon: Settings },
-];
+import { useAuth } from "@/context/AuthContext";
+import { Role } from "@/lib/api";
+
+type NavItem = { title: string; href: string; icon: typeof LayoutDashboard };
+
+// Navigation is role-scoped: a patient never sees Train Model (they can't
+// train), and staff land on their own dashboards instead of the patient one.
+const MENUS: Record<Role, NavItem[]> = {
+  patient: [
+    { title: "Dashboard", href: "/", icon: LayoutDashboard },
+    { title: "Live Session", href: "/live-session", icon: Camera },
+    { title: "Exercises", href: "/exercises", icon: Dumbbell },
+    { title: "Progress", href: "/progress", icon: LineChart },
+    { title: "Reports", href: "/reports", icon: ClipboardList },
+    { title: "Settings", href: "/settings", icon: Settings },
+  ],
+  therapist: [
+    { title: "My Patients", href: "/therapist", icon: Users },
+    { title: "Exercises", href: "/exercises", icon: Dumbbell },
+    { title: "Train Model", href: "/reference", icon: BrainCircuit },
+    { title: "Settings", href: "/settings", icon: Settings },
+  ],
+  admin: [
+    { title: "Overview", href: "/admin", icon: ShieldCheck },
+    { title: "Patients", href: "/therapist", icon: Users },
+    { title: "Exercises", href: "/exercises", icon: Dumbbell },
+    { title: "Train Model", href: "/reference", icon: BrainCircuit },
+    { title: "Settings", href: "/settings", icon: Settings },
+  ],
+};
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const { user } = useAuth();
+  const menu = MENUS[user?.role ?? "patient"];
 
   return (
     <aside className="w-64 shrink-0 bg-slate-900 border-r border-slate-800 h-screen sticky top-0 flex flex-col">

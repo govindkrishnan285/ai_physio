@@ -137,6 +137,44 @@ export interface MeResponse {
   therapist_profile: TherapistProfile | null;
 }
 
+export interface PatientRosterItem {
+  patient_profile_id: string;
+  name: string;
+  email: string;
+  injury_type: string;
+  recovery_stage: string;
+  session_count: number;
+  last_session_date: string | null;
+  avg_accuracy: number | null;
+}
+
+export interface UserAdminItem {
+  id: string;
+  email: string;
+  full_name: string;
+  role: Role;
+  is_active: boolean;
+  is_verified: boolean;
+  patient_profile_id: string | null;
+  therapist_id: string | null;
+}
+
+export interface TherapistOption {
+  therapist_id: string;
+  name: string;
+  email: string;
+  patient_count: number;
+}
+
+export interface AdminOverview {
+  total_users: number;
+  patients: number;
+  therapists: number;
+  admins: number;
+  unassigned_patients: number;
+  total_sessions: number;
+}
+
 export interface SessionCreateInput {
   // No patient_id: the backend derives ownership from the access token.
   exercise: string;
@@ -552,5 +590,30 @@ export const api = {
     } catch {
       return null;
     }
+  },
+
+  // --- Therapist ---
+  async getMyPatients(): Promise<PatientRosterItem[]> {
+    return request("/therapist/patients");
+  },
+
+  // --- Admin ---
+  async getAdminOverview(): Promise<AdminOverview> {
+    return request("/admin/overview");
+  },
+  async getAdminUsers(): Promise<UserAdminItem[]> {
+    return request("/admin/users");
+  },
+  async getAdminTherapists(): Promise<TherapistOption[]> {
+    return request("/admin/therapists");
+  },
+  async assignTherapist(
+    patientProfileId: string,
+    therapistId: string | null
+  ): Promise<UserAdminItem> {
+    return request(`/admin/patients/${patientProfileId}/assign`, {
+      method: "PATCH",
+      body: JSON.stringify({ therapist_id: therapistId }),
+    });
   },
 };
