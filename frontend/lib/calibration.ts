@@ -16,14 +16,33 @@ const RESUME_THRESHOLD_MARGIN = 12; // hysteresis so it doesn't flicker
 const NOSE = 0;
 const L_SHOULDER = 11;
 const R_SHOULDER = 12;
+const L_ELBOW = 13;
+const R_ELBOW = 14;
 const L_WRIST = 15;
 const R_WRIST = 16;
 const L_HIP = 23;
 const R_HIP = 24;
+const L_KNEE = 25;
+const R_KNEE = 26;
 const L_ANKLE = 27;
 const R_ANKLE = 28;
 
-const KEY_BODY = [NOSE, L_SHOULDER, R_SHOULDER, L_HIP, R_HIP, 25, 26, L_ANKLE, R_ANKLE];
+export type FocusRegion = "upper" | "lower" | "full";
+
+// The landmarks that must be framed for each exercise focus. A knee rehab
+// doesn't need the head; a shoulder rehab doesn't need the feet. Hips are in
+// both because hip/shoulder angles are measured relative to the torso.
+const REGION_BODY: Record<FocusRegion, number[]> = {
+  full: [NOSE, L_SHOULDER, R_SHOULDER, L_HIP, R_HIP, L_KNEE, R_KNEE, L_ANKLE, R_ANKLE],
+  lower: [L_SHOULDER, R_SHOULDER, L_HIP, R_HIP, L_KNEE, R_KNEE, L_ANKLE, R_ANKLE],
+  upper: [L_SHOULDER, R_SHOULDER, L_ELBOW, R_ELBOW, L_WRIST, R_WRIST, L_HIP, R_HIP],
+};
+
+const REGION_LABEL: Record<FocusRegion, string> = {
+  full: "your whole body — head to feet —",
+  lower: "your lower body — hips to feet —",
+  upper: "your upper body — shoulders to hands —",
+};
 
 export type CheckSeverity = "critical" | "warning";
 
@@ -67,14 +86,16 @@ interface AnalyzeInput {
   frame: FrameQuality | null;
   stability: number; // 0..1 (1 = rock steady)
   threshold: number;
+  /** Which body region the exercise works — scopes the framing checks. */
+  focus?: FocusRegion;
 }
 
 const vis = (lm: Landmark[], i: number) => lm[i]?.visibility ?? 0;
 const inFrame = (lm: Landmark[], i: number) =>
   lm[i] && lm[i].x > 0.02 && lm[i].x < 0.98 && lm[i].y > 0.02 && lm[i].y < 0.98;
 
-function bodyScale(lm: Landmark[]): number {
-  const ys = KEY_BODY.map((i) => lm[i]?.y).filter((y) => typeof y === "number");
+function bodyScale(lm: Landmark[], region: number[]): number {
+  const ys = region.map((i) => lm[i]?.y).filter((y) => typeof y === "number");
   if (ys.length < 4) return 0;
   return Math.max(...ys) - Math.min(...ys);
 }
@@ -97,6 +118,7 @@ export function analyzeCalibration({
   frame,
   stability,
   threshold,
+  focus = "full",
 }: AnalyzeInput): CalibrationReport {
   const checks: CalibrationCheck[] = [];
   const add = (
@@ -109,6 +131,9 @@ export function analyzeCalibration({
 
   const hasPose = !!landmarks && landmarks.length >= 33;
   const lm = landmarks ?? [];
+  const region = REGION_BODY[focus];
+  const needsFeet = focus !== "upper";
+  const needsHands = focus === "upper";
 
   // ---- Presence / visibility ----
   add(
@@ -119,29 +144,45 @@ export function analyzeCalibration({
     "critical"
   );
 
-  const fullBody =
-    hasPose && KEY_BODY.every((i) => vis(lm, i) > 0.5);
+  // Only the landmarks the exercise actually needs must be framed.
+  const regionVisible = hasPose && region.every((i) => vis(lm, i) > 0.5);
   add(
     "fullBody",
-    "Full body visible",
-    fullBody,
-    "Make sure your whole body — head to feet — is inside the frame.",
+    focus === "full" ? "Full body visible" : "Working area visible",
+    regionVisible,
+    `Keep ${REGION_LABEL[focus]} inside the frame.`,
     "critical"
   );
 
-  const feet =
-    hasPose && vis(lm, L_ANKLE) > 0.5 && vis(lm, R_ANKLE) > 0.5 && lm[L_ANKLE].y < 0.98 && lm[R_ANKLE].y < 0.98;
-  add("feet", "Both feet visible", feet, "Step back until both feet are inside the frame.", "critical");
+  // Feet only matter for lower-body / full exercises.
+  if (needsFeet) {
+    const feet =
+      hasPose && vis(lm, L_ANKLE) > 0.5 && vis(lm, R_ANKLE) > 0.5 && lm[L_ANKLE].y < 0.98 && lm[R_ANKLE].y < 0.98;
+    add("feet", "Both feet visible", feet, "Step back until both feet are inside the frame.", "critical");
+  }
 
-  const hands =
-    hasPose && vis(lm, L_WRIST) > 0.4 && vis(lm, R_WRIST) > 0.4;
-  add("hands", "Both hands visible", hands, "Bring both hands into view.");
+  // Hands are required for upper-body exercises, optional otherwise.
+  const hands = hasPose && vis(lm, L_WRIST) > 0.4 && vis(lm, R_WRIST) > 0.4;
+  add(
+    "hands",
+    "Both hands visible",
+    hands,
+    "Bring both hands into view.",
+    needsHands ? "critical" : "warning"
+  );
 
-  const head = hasPose && vis(lm, NOSE) > 0.5 && lm[NOSE].y > 0.02;
-  add("head", "Head in frame", head, "Raise the camera so your head is inside the frame.");
+  // Head only matters when the whole body is in scope.
+  if (focus === "full") {
+    const head = hasPose && vis(lm, NOSE) > 0.5 && lm[NOSE].y > 0.02;
+    add("head", "Head in frame", head, "Raise the camera so your head is inside the frame.");
+  }
 
-  // ---- Centering ----
-  const midX = hasPose ? (lm[L_HIP].x + lm[R_HIP].x) / 2 : 0.5;
+  // ---- Centering ---- (upper exercises center on the shoulders, else hips)
+  const midX = !hasPose
+    ? 0.5
+    : focus === "upper"
+      ? (lm[L_SHOULDER].x + lm[R_SHOULDER].x) / 2
+      : (lm[L_HIP].x + lm[R_HIP].x) / 2;
   const centered = hasPose && midX > 0.34 && midX < 0.66;
   add(
     "centered",
@@ -150,8 +191,8 @@ export function analyzeCalibration({
     midX <= 0.34 ? "Move to the right, into the center of the frame." : "Move to the left, into the center of the frame."
   );
 
-  // ---- Distance / scale ----
-  const scale = hasPose ? bodyScale(lm) : 0;
+  // ---- Distance / scale ---- (measured over the region actually in scope)
+  const scale = hasPose ? bodyScale(lm, region) : 0;
   const tooClose = hasPose && scale > 0.96;
   const tooFar = hasPose && scale > 0 && scale < 0.5;
   add("distance", "Good distance", hasPose && !tooClose && !tooFar,
@@ -163,8 +204,9 @@ export function analyzeCalibration({
   add("level", "Camera level", !hasPose || level,
     roll > 0 ? "Tilt the camera slightly counter-clockwise to level it." : "Tilt the camera slightly clockwise to level it.");
 
-  const feetCut = hasPose && (lm[L_ANKLE].y > 0.98 || lm[R_ANKLE].y > 0.98);
-  const headCut = hasPose && lm[NOSE].y < 0.04;
+  // Only warn about a cut-off edge that this exercise actually needs framed.
+  const feetCut = hasPose && needsFeet && (lm[L_ANKLE].y > 0.98 || lm[R_ANKLE].y > 0.98);
+  const headCut = hasPose && focus === "full" && lm[NOSE].y < 0.04;
   add("framing", "Vertical framing", !hasPose || (!feetCut && !headCut),
     feetCut ? "Lower the camera or step back — your feet are cut off." : "Raise the camera — your head is cut off.");
 
@@ -186,9 +228,9 @@ export function analyzeCalibration({
   const steady = stability > 0.55;
   add("stability", "Camera steady", steady, "Hold the camera steady or place it on a stable surface.");
 
-  // ---- Subscores (0-100) ----
-  const visibleCount = hasPose ? KEY_BODY.filter((i) => vis(lm, i) > 0.5).length : 0;
-  const visibility = clamp((visibleCount / KEY_BODY.length) * 100 - (feet ? 0 : 15) - (head ? 0 : 10));
+  // ---- Subscores (0-100) ---- (scored over the in-scope region)
+  const visibleCount = hasPose ? region.filter((i) => vis(lm, i) > 0.5).length : 0;
+  const visibility = clamp((visibleCount / region.length) * 100);
   const confidenceScore = clamp(confidence * 100);
   const lighting = clamp(
     100 - (dark ? 55 : 0) - (bright ? 40 : 0) - Math.max(0, (0.08 - contrast) * 400) - backlight * 40

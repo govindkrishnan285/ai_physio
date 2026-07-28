@@ -106,12 +106,13 @@ export function jointReadings(
   angles: JointAngles,
   exercise: ExerciseConfig
 ): JointReading[] {
-  return JOINT_ORDER.map((key) => {
+  // Only the joints this exercise actually works (those with an optimal angle).
+  // A knee rehab shouldn't clutter the panel with shoulder/elbow readings.
+  return JOINT_ORDER.filter(
+    (key) => exercise.optimalAngles[key] !== undefined
+  ).map((key) => {
     const current = angles[key];
-    const target = exercise.optimalAngles[key] ?? null;
-    if (target === null) {
-      return { key, label: JOINT_LABELS[key], current, target: null, diff: null, severity: null };
-    }
+    const target = exercise.optimalAngles[key] as number;
     const diff = current - target;
     return {
       key,

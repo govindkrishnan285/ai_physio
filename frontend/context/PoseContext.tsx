@@ -113,8 +113,9 @@ export function PoseProvider({ children }: { children: React.ReactNode }) {
       frame: frameQuality,
       stability,
       threshold: qualityThreshold,
+      focus: selectedExercise.focus,
     });
-  }, [cameraOn, pose.landmarks, pose.poseCount, pose.confidence, frameQuality, stability, qualityThreshold]);
+  }, [cameraOn, pose.landmarks, pose.poseCount, pose.confidence, frameQuality, stability, qualityThreshold, selectedExercise.focus]);
 
   // Exercise analysis is gated: active phase, quality OK, and actually tracking.
   const analysisActive = sessionPhase === "active" && !degraded;

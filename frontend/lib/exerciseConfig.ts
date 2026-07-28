@@ -9,6 +9,12 @@ export interface ExerciseConfig {
    * "extension": the worked position is a LARGER angle than rest (e.g. raising an arm).
    */
   direction: "flexion" | "extension";
+  /**
+   * Which part of the body the exercise actually works. Drives what the camera
+   * must frame (calibration) and which joints/metrics are shown — e.g. a knee
+   * rehab doesn't need your head in frame, a shoulder rehab doesn't need feet.
+   */
+  focus: "upper" | "lower" | "full";
   restThreshold: number;
   workThreshold: number;
   targetRange: [number, number];
@@ -48,6 +54,7 @@ export const exercises: ExerciseConfig[] = [
     category: "Knee",
     jointKeys: ["leftKnee", "rightKnee"],
     direction: "flexion",
+    focus: "lower",
     restThreshold: 160,
     workThreshold: 130,
     targetRange: [80, 110],
@@ -66,6 +73,7 @@ export const exercises: ExerciseConfig[] = [
     category: "Knee",
     jointKeys: ["leftKnee", "rightKnee"],
     direction: "flexion",
+    focus: "lower",
     restThreshold: 160,
     workThreshold: 140,
     targetRange: [110, 140],
@@ -84,6 +92,7 @@ export const exercises: ExerciseConfig[] = [
     category: "Shoulder",
     jointKeys: ["leftShoulder", "rightShoulder"],
     direction: "extension",
+    focus: "upper",
     restThreshold: 30,
     workThreshold: 60,
     targetRange: [80, 160],
@@ -107,6 +116,7 @@ export const exercises: ExerciseConfig[] = [
     category: "Shoulder",
     jointKeys: ["leftShoulder", "rightShoulder"],
     direction: "extension",
+    focus: "upper",
     restThreshold: 20,
     workThreshold: 45,
     targetRange: [60, 100],
@@ -130,6 +140,7 @@ export const exercises: ExerciseConfig[] = [
     category: "Neurological",
     jointKeys: ["leftElbow", "rightElbow"],
     direction: "extension",
+    focus: "upper",
     restThreshold: 90,
     workThreshold: 120,
     targetRange: [150, 180],
@@ -148,6 +159,7 @@ export const exercises: ExerciseConfig[] = [
     category: "Neurological",
     jointKeys: ["leftHip", "rightHip"],
     direction: "flexion",
+    focus: "lower",
     restThreshold: 175,
     workThreshold: 160,
     targetRange: [150, 175],
@@ -166,6 +178,7 @@ export const exercises: ExerciseConfig[] = [
     category: "Spine",
     jointKeys: ["leftHip", "rightHip"],
     direction: "flexion",
+    focus: "lower",
     restThreshold: 165,
     workThreshold: 140,
     targetRange: [100, 140],
@@ -184,6 +197,7 @@ export const exercises: ExerciseConfig[] = [
     category: "Spine",
     jointKeys: [],
     direction: "flexion",
+    focus: "full",
     restThreshold: 0,
     workThreshold: 0,
     targetRange: [0, 0],
@@ -203,6 +217,7 @@ export const exercises: ExerciseConfig[] = [
     category: "Assessment",
     jointKeys: ["leftKnee", "rightKnee"],
     direction: "flexion",
+    focus: "lower",
     restThreshold: 160,
     workThreshold: 120,
     targetRange: [70, 100],
@@ -220,6 +235,7 @@ export const exercises: ExerciseConfig[] = [
     category: "Assessment",
     jointKeys: ["leftKnee", "rightKnee"],
     direction: "flexion",
+    focus: "lower",
     restThreshold: 160,
     workThreshold: 130,
     targetRange: [80, 110],
