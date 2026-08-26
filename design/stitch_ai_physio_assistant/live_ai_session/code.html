@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Physio | Live Session</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        :root {
+            --teal-glow: 0 0 20px rgba(79, 219, 200, 0.3);
+            --amber-glow: 0 0 15px rgba(228, 146, 0, 0.4);
+        }
+        .glass-panel {
+            background: rgba(18, 33, 49, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(60, 73, 71, 0.5);
+        }
+        .skeleton-line {
+            filter: drop-shadow(0 0 4px #4fdbc8);
+        }
+        .joint-node {
+            box-shadow: 0 0 8px #4fdbc8;
+        }
+        .joint-node-alert {
+            box-shadow: 0 0 12px #ffb4ab;
+            animation: pulse-alert 2s infinite;
+        }
+        @keyframes pulse-alert {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        .arc-path {
+            stroke-linecap: round;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                "tertiary-fixed": "#ffddb8",
+                "on-primary": "#003731",
+                "secondary-fixed-dim": "#bec6e0",
+                "tertiary": "#ffb95f",
+                "inverse-primary": "#006b5f",
+                "surface-container-low": "#0d1c2d",
+                "surface-container": "#122131",
+                "surface-dim": "#051424",
+                "surface": "#051424",
+                "on-secondary-container": "#adb4ce",
+                "tertiary-fixed-dim": "#ffb95f",
+                "outline-variant": "#3c4947",
+                "secondary-container": "#3f465c",
+                "on-tertiary": "#472a00",
+                "background": "#051424",
+                "primary-fixed": "#71f8e4",
+                "on-error-container": "#ffdad6",
+                "on-error": "#690005",
+                "error": "#ffb4ab",
+                "surface-tint": "#4fdbc8",
+                "on-secondary-fixed": "#131b2e",
+                "secondary": "#bec6e0",
+                "error-container": "#93000a",
+                "on-surface-variant": "#bbcac6",
+                "inverse-on-surface": "#233143",
+                "surface-container-high": "#1c2b3c",
+                "primary-fixed-dim": "#4fdbc8",
+                "on-secondary-fixed-variant": "#3f465c",
+                "on-tertiary-fixed-variant": "#653e00",
+                "on-primary-container": "#00423b",
+                "primary-container": "#14b8a6",
+                "surface-bright": "#2c3a4c",
+                "on-primary-fixed": "#00201c",
+                "on-primary-fixed-variant": "#005048",
+                "surface-container-highest": "#273647",
+                "primary": "#4fdbc8",
+                "outline": "#859490",
+                "secondary-fixed": "#dae2fd",
+                "on-tertiary-container": "#543300",
+                "surface-variant": "#273647",
+                "on-background": "#d4e4fa",
+                "on-surface": "#d4e4fa",
+                "tertiary-container": "#e49200",
+                "on-secondary": "#283044",
+                "surface-container-lowest": "#010f1f",
+                "on-tertiary-fixed": "#2a1700",
+                "inverse-surface": "#d4e4fa"
+              },
+              "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+              },
+              "spacing": {
+                "unit": "4px",
+                "margin-desktop": "40px",
+                "stack-md": "24px",
+                "container-max": "1280px",
+                "stack-lg": "48px",
+                "margin-mobile": "16px",
+                "gutter": "24px",
+                "stack-sm": "12px"
+              },
+              "fontFamily": {
+                "headline-md": ["Inter"],
+                "display-lg-mobile": ["Inter"],
+                "body-base": ["Inter"],
+                "display-lg": ["Inter"],
+                "label-caps": ["JetBrains Mono"],
+                "stat-value": ["Inter"]
+              },
+              "fontSize": {
+                "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "body-base": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400"}],
+                "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                "stat-value": ["32px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="bg-surface-container-lowest text-on-surface font-body-base overflow-hidden select-none">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 right-0 left-0 z-50 flex justify-between items-center px-margin-desktop h-20 bg-surface-dim/80 backdrop-blur-md border-b border-outline-variant/30">
+<div class="flex items-center gap-stack-md">
+<span class="font-headline-md text-headline-md font-bold text-primary">AI Physio</span>
+<div class="h-6 w-[1px] bg-outline-variant/50"></div>
+<div class="flex flex-col">
+<span class="font-label-caps text-label-caps text-on-surface-variant tracking-widest uppercase">Live Session</span>
+<span class="text-primary font-bold">Single-Leg Squat Analysis</span>
+</div>
+</div>
+<div class="flex items-center gap-gutter">
+<div class="flex items-center gap-2 px-3 py-1 bg-error-container/20 border border-error/30 rounded-full">
+<div class="w-2 h-2 rounded-full bg-error animate-pulse"></div>
+<span class="font-label-caps text-label-caps text-error">RECORDING</span>
+</div>
+<button class="flex items-center justify-center p-2 rounded-full hover:bg-surface-variant/50 transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full border border-primary/30 p-0.5 overflow-hidden">
+<img class="w-full h-full object-cover rounded-full" data-alt="A clean, professional headshot of a clinical physiotherapist with a modern, high-tech background featuring soft teal light leaks. The person has a warm yet authoritative expression, emphasizing clinical excellence and human warmth. Cinematic lighting with deep shadows and sharp focus, matching a premium dark UI aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIj9E6hZyAjDtD4FeKkzOGW0A3YwmA3_VKkDQR7mCq4KHGP3fWrKMoqmlmavm7qH1WEG3ln5ZUvJj9ikr1VMPX9bbik34k1AnK8KM3ACsCYd5B8UWPqK63ARVAHjdHSJxou6rO1zUSa3dZ7M-091W08isPm3fJjbcH-YU8zuM8xwjo7z6eMTJbNQFqfzvZC33YbqABJAKTxf349T_zc0p7wD3sGIhAvNmm5SBvEkGtcPHWfn1TLiegxA"/>
+</div>
+</div>
+</header>
+<main class="flex h-screen pt-20">
+<!-- Main Video Viewport -->
+<section class="relative flex-1 bg-surface-dim overflow-hidden">
+<!-- Patient Video Stream (Simulated via Image) -->
+<div class="absolute inset-0 w-full h-full">
+<img class="w-full h-full object-cover opacity-60" data-alt="A wide-angle shot of a patient performing a single-leg squat in a dimly lit, minimalist home gym. The patient is captured from the front, illuminated by cool teal and soft white studio lighting. The background is a sophisticated slate-950 color with subtle textures. The scene looks like a frame from a high-end medical motion-capture session." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0sn3dDddUiu-_xj4x2GecJFlrcZjAYs3jFCykbNh64GZTflw9Yt53iK0XborZS2VuiZBl4U_r7smYH8raqg5mUFcIGIN9uGIsGZ2Wg_Vato9C2GOUgfrvCMY309U3iY1jn26EtteFzk3a_HGhebZnI-NOOneDX2uMQHw3C8hxapq013mdS_3G_Z066rbW_7F34JQ989XbaX_fsuF55iHxSUJJvIzMMYUypaOYyYlxRMUfVyC3xeqSog"/>
+</div>
+<!-- AI Overlay: Skeleton & Joint Labels -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none" viewbox="0 0 1000 1000">
+<!-- Skeleton Lines (Conceptual Points) -->
+<g class="skeleton-line stroke-primary" stroke-linecap="round" stroke-width="4">
+<!-- Spine/Torso -->
+<line x1="500" x2="500" y1="200" y2="450"></line>
+<!-- Shoulders -->
+<line x1="420" x2="580" y1="250" y2="250"></line>
+<!-- Right Leg (Supporting) -->
+<line x1="500" x2="480" y1="450" y2="650"></line>
+<line class="animate-pulse" stroke="#ffb4ab" x1="480" x2="510" y1="650" y2="880"></line>
+</g>
+<!-- Joint Nodes -->
+<circle class="joint-node fill-primary" cx="500" cy="200" r="6"></circle> <!-- Neck -->
+<circle class="joint-node fill-primary" cx="420" cy="250" r="6"></circle> <!-- L Shoulder -->
+<circle class="joint-node fill-primary" cx="580" cy="250" r="6"></circle> <!-- R Shoulder -->
+<circle class="joint-node fill-primary" cx="500" cy="450" r="8"></circle> <!-- Pelvis -->
+<circle class="joint-node-alert fill-error" cx="480" cy="650" r="10"></circle> <!-- Knee (Issue) -->
+<circle class="joint-node fill-primary" cx="510" cy="880" r="6"></circle> <!-- Ankle -->
+<!-- Dynamic Labels -->
+<foreignobject height="60" width="120" x="500" y="620">
+<div class="flex flex-col items-start bg-surface-container/90 border border-error/50 p-2 rounded-lg backdrop-blur-sm">
+<span class="font-label-caps text-[10px] text-error">KNEE ANGLE</span>
+<span class="font-stat-value text-xl text-error">115°</span>
+</div>
+</foreignobject>
+<foreignobject height="60" width="120" x="520" y="420">
+<div class="flex flex-col items-start bg-surface-container/90 border border-primary/30 p-2 rounded-lg backdrop-blur-sm">
+<span class="font-label-caps text-[10px] text-primary">PELVIC TILT</span>
+<span class="font-stat-value text-xl text-primary">2°</span>
+</div>
+</foreignobject>
+</svg>
+<!-- Bottom Video Overlay: Controls & PIP -->
+<div class="absolute bottom-6 left-6 right-6 flex items-end justify-between">
+<!-- Reference Video (PIP) -->
+<div class="group relative w-64 aspect-video rounded-xl border border-outline-variant overflow-hidden shadow-2xl glass-panel">
+<img class="w-full h-full object-cover" data-alt="Close-up reference video of a professional fitness trainer performing a perfect single-leg squat. The trainer is dressed in sleek charcoal athletic wear. The lighting is bright and directional, emphasizing muscle definition and proper joint alignment. A ghosted teal line shows the ideal path of movement." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdblsdOsVjMRbnq1E2DV8YQRzcgc4IkIqREzMea-RJDRJ5RpgMhMTszRFO2VIEtiwNp_5HPR1JAeZSJLXWiu0lYpEK3eyKw4Qreo8teKE5Fvou2iw6KKvQ_cSVI68ZvhCD-B44e96vsOUlPW7vV697_sn9T2KGRyj_s5ASjNIpSxPtAxnlC7m0yW4baz4CmlCrVocZMp-ld3A3jLUuciSNgLRag0XBL--5meNLA7rRWjLvbA_aOuh0kQ"/>
+<div class="absolute top-2 left-2 px-2 py-0.5 bg-primary rounded-full">
+<span class="font-label-caps text-[9px] text-on-primary font-bold">PRO REFERENCE</span>
+</div>
+<div class="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors"></div>
+</div>
+<!-- Live Command Bar -->
+<div class="flex gap-4 p-2 glass-panel rounded-full border border-outline-variant/40">
+<button class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-variant text-on-surface hover:bg-surface-bright transition-colors">
+<span class="material-symbols-outlined">mic</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center rounded-full bg-error text-on-error hover:opacity-90 transition-all active:scale-95">
+<span class="material-symbols-outlined">call_end</span>
+</button>
+<button class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-variant text-on-surface hover:bg-surface-bright transition-colors">
+<span class="material-symbols-outlined">videocam</span>
+</button>
+<div class="w-[1px] h-8 bg-outline-variant self-center"></div>
+<button class="px-6 h-12 flex items-center justify-center rounded-full bg-primary text-on-primary font-bold transition-all active:scale-95">
+                        Complete Session
+                    </button>
+</div>
+</div>
+</section>
+<!-- Sidebar Panel -->
+<aside class="w-80 h-full bg-surface-container border-l border-outline-variant/20 flex flex-col p-6 gap-stack-md overflow-y-auto">
+<!-- Reps Counter -->
+<div class="relative flex flex-col items-center justify-center p-6 bg-surface-container-high rounded-2xl border border-outline-variant/30">
+<svg class="w-32 h-32" viewbox="0 0 100 100">
+<circle class="stroke-surface-container-highest" cx="50" cy="50" fill="transparent" r="42" stroke-width="8"></circle>
+<circle class="progress-ring-circle stroke-primary" cx="50" cy="50" fill="transparent" r="42" stroke-dasharray="264" stroke-dashoffset="88" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center pt-2">
+<span class="font-stat-value text-4xl text-on-surface">8</span>
+<span class="font-label-caps text-on-surface-variant">OF 12 REPS</span>
+</div>
+<div class="mt-4 px-3 py-1 bg-primary/10 border border-primary/30 rounded-full">
+<span class="font-label-caps text-primary text-[10px]">RECOVERY PHASE</span>
+</div>
+</div>
+<!-- Quality Gauge -->
+<div class="flex flex-col p-4 bg-surface-container-high rounded-2xl border border-outline-variant/30 gap-2">
+<span class="font-label-caps text-on-surface-variant">FORM QUALITY</span>
+<div class="relative pt-6">
+<svg class="w-full" viewbox="0 0 100 50">
+<path class="arc-path" d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#273647" stroke-width="8"></path>
+<path class="arc-path" d="M 10 50 A 40 40 0 0 1 80 20" fill="none" stroke="#4fdbc8" stroke-width="8"></path>
+</svg>
+<div class="absolute bottom-0 left-0 right-0 text-center">
+<span class="font-headline-md text-primary">Excellent</span>
+</div>
+</div>
+</div>
+<!-- Range of Motion -->
+<div class="flex flex-col p-4 bg-surface-container-high rounded-2xl border border-outline-variant/30 gap-4">
+<div class="flex justify-between items-center">
+<span class="font-label-caps text-on-surface-variant">RANGE OF MOTION</span>
+<span class="font-label-caps text-primary text-[10px]">TARGET: 140°</span>
+</div>
+<div class="flex items-end gap-2">
+<div class="flex-1 h-3 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary" style="width: 82%;"></div>
+</div>
+<span class="font-stat-value text-xl text-on-surface leading-none">115°</span>
+</div>
+</div>
+<!-- Real-time Phase/Feedback -->
+<div class="flex flex-col gap-3">
+<div class="flex items-center gap-3 p-4 bg-primary/5 border border-primary/20 rounded-xl">
+<div class="w-2 h-2 rounded-full bg-primary animate-ping"></div>
+<span class="font-bold text-primary">Holding... (2.4s)</span>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex items-start gap-3 p-3 bg-surface-container-highest/50 rounded-xl border border-outline-variant/10">
+<span class="material-symbols-outlined text-primary text-xl">info</span>
+<p class="text-sm text-on-surface-variant leading-tight">Keep your back straight and chest proud.</p>
+</div>
+<div class="flex items-start gap-3 p-3 bg-tertiary-container/10 rounded-xl border border-tertiary-container/30">
+<span class="material-symbols-outlined text-tertiary text-xl">warning</span>
+<p class="text-sm text-tertiary leading-tight">Slow down on the descent to maximize control.</p>
+</div>
+</div>
+</div>
+<!-- Session Stats Mini-Card -->
+<div class="mt-auto pt-6 border-t border-outline-variant/20 flex flex-col gap-2">
+<div class="flex justify-between text-xs font-label-caps text-on-surface-variant">
+<span>ELAPSED</span>
+<span>14:22</span>
+</div>
+<div class="flex justify-between text-xs font-label-caps text-on-surface-variant">
+<span>AVG QUALITY</span>
+<span class="text-primary">94%</span>
+</div>
+</div>
+</aside>
+</main>
+<!-- Micro-interaction Scripts -->
+<script>
+        // Simple interactive feedback simulation
+        const progressCircle = document.querySelector('.progress-ring-circle');
+        const radius = progressCircle.r.baseVal.value;
+        const circumference = radius * 2 * Math.PI;
+        
+        function setProgress(percent) {
+            const offset = circumference - (percent / 100 * circumference);
+            progressCircle.style.strokeDashoffset = offset;
+        }
+
+        // Random jitter for "Live" feel
+        setInterval(() => {
+            const angleSpan = document.querySelectorAll('.font-stat-value')[0];
+            if(angleSpan) {
+                const current = parseInt(angleSpan.innerText);
+                const jitter = (Math.random() - 0.5) * 2;
+                angleSpan.innerText = `${Math.floor(115 + jitter)}°`;
+            }
+        }, 1500);
+    </script>
+</body></html>

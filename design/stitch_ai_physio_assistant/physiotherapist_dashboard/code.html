@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Physio | Clinician Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#ffddb8",
+                    "on-primary": "#003731",
+                    "secondary-fixed-dim": "#bec6e0",
+                    "tertiary": "#ffb95f",
+                    "inverse-primary": "#006b5f",
+                    "surface-container-low": "#0d1c2d",
+                    "surface-container": "#122131",
+                    "surface-dim": "#051424",
+                    "surface": "#051424",
+                    "on-secondary-container": "#adb4ce",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "outline-variant": "#3c4947",
+                    "secondary-container": "#3f465c",
+                    "on-tertiary": "#472a00",
+                    "background": "#051424",
+                    "primary-fixed": "#71f8e4",
+                    "on-error-container": "#ffdad6",
+                    "on-error": "#690005",
+                    "error": "#ffb4ab",
+                    "surface-tint": "#4fdbc8",
+                    "on-secondary-fixed": "#131b2e",
+                    "secondary": "#bec6e0",
+                    "error-container": "#93000a",
+                    "on-surface-variant": "#bbcac6",
+                    "inverse-on-surface": "#233143",
+                    "surface-container-high": "#1c2b3c",
+                    "primary-fixed-dim": "#4fdbc8",
+                    "on-secondary-fixed-variant": "#3f465c",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "on-primary-container": "#00423b",
+                    "primary-container": "#14b8a6",
+                    "surface-bright": "#2c3a4c",
+                    "on-primary-fixed": "#00201c",
+                    "on-primary-fixed-variant": "#005048",
+                    "surface-container-highest": "#273647",
+                    "primary": "#4fdbc8",
+                    "outline": "#859490",
+                    "secondary-fixed": "#dae2fd",
+                    "on-tertiary-container": "#543300",
+                    "surface-variant": "#273647",
+                    "on-background": "#d4e4fa",
+                    "on-surface": "#d4e4fa",
+                    "tertiary-container": "#e49200",
+                    "on-secondary": "#283044",
+                    "surface-container-lowest": "#010f1f",
+                    "on-tertiary-fixed": "#2a1700",
+                    "inverse-surface": "#d4e4fa"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "margin-desktop": "40px",
+                    "stack-md": "24px",
+                    "container-max": "1280px",
+                    "stack-lg": "48px",
+                    "margin-mobile": "16px",
+                    "gutter": "24px",
+                    "stack-sm": "12px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Inter"],
+                    "display-lg-mobile": ["Inter"],
+                    "body-base": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "label-caps": ["JetBrains Mono"],
+                    "stat-value": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-base": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "stat-value": ["32px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-panel {
+            background: rgba(18, 33, 49, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(60, 73, 71, 0.3);
+        }
+        .teal-glow {
+            box-shadow: 0 0 20px rgba(79, 219, 200, 0.1);
+        }
+        .active-nav-item {
+            border-right: 4px solid #4fdbc8;
+            background: rgba(79, 219, 200, 0.1);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .sparkline-container {
+            width: 80px;
+            height: 24px;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen overflow-x-hidden">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 right-0 left-0 z-50 flex justify-between items-center px-margin-desktop h-20 bg-surface-dim/80 backdrop-blur-md border-b border-outline-variant/30">
+<div class="flex items-center gap-4">
+<span class="font-headline-md text-headline-md font-bold text-primary">AI Physio</span>
+<div class="hidden md:flex ml-8 items-center bg-surface-container rounded-full px-4 py-2 border border-outline-variant/20">
+<span class="material-symbols-outlined text-on-surface-variant mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-base text-on-surface w-64" placeholder="Search patients..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-stack-md">
+<button class="p-2 rounded-full hover:bg-surface-variant/50 transition-colors relative">
+<span class="material-symbols-outlined text-primary">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+<div class="flex items-center gap-3 pl-4 border-l border-outline-variant/30">
+<div class="text-right hidden sm:block">
+<p class="font-label-caps text-label-caps text-on-surface">Dr. Sarah Chen</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-widest">Clinical Lead</p>
+</div>
+<img class="w-10 h-10 rounded-full border-2 border-primary/30 object-cover" data-alt="A professional headshot of a female clinician with a warm, confident expression. She has dark hair tied back, wearing a clean, modern medical scrub in a soft grey tone. The background is a blurred, high-tech clinic with teal lighting accents. Professional photography style, soft high-key lighting, 8k resolution, minimalist health-tech aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRVNtg8KiX-HVopXTBTckDMfp0z8cZTmWbEdcGI1TP3Ed4azCojmQCjOotzQMoEFXqKvw24VUcKhP_h8zWuNFscBIBry-8iavn_mtQPFPVVHUXDMkr44ZtSHABtggQG5mTdspiEDlXO7Rso5r-JMWvxA5g-rJ9ICfgDRqdu8btUk0Vzj5ZTSveYJ3X8CwNdIQLCiwcn9F9mgC6gpLz2wyYLq_PpYHq8P9r89UIT_6Ua866BTloSbOu0A"/>
+</div>
+</div>
+</header>
+<!-- Side Navigation -->
+<aside class="fixed left-0 top-0 bottom-0 flex flex-col py-stack-md w-64 z-40 bg-surface-container border-r border-outline-variant/20 pt-24 hidden lg:flex">
+<nav class="flex-1 space-y-1 px-3">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-primary border-r-4 border-primary bg-primary/10 transition-transform translate-x-1" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">fitness_center</span>
+<span class="font-label-caps text-label-caps">Exercises</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="font-label-caps text-label-caps">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-caps text-label-caps">Reports</span>
+</a>
+<div class="pt-8 pb-4 px-4">
+<p class="text-[10px] text-on-surface-variant uppercase tracking-[0.2em] font-bold">Preferences</p>
+</div>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">notifications</span>
+<span class="font-label-caps text-label-caps">Notifications</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+</nav>
+<div class="px-4 mt-auto">
+<button class="w-full bg-primary text-on-primary font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined">add</span>
+<span class="font-label-caps text-label-caps">Start Session</span>
+</button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="lg:ml-64 pt-24 px-4 md:px-8 pb-12 transition-all duration-300">
+<div class="max-w-container-max mx-auto">
+<div class="flex flex-col lg:flex-row gap-8">
+<!-- Left Column: Patient Roster -->
+<div class="lg:w-3/5 space-y-6">
+<div class="flex justify-between items-end">
+<div>
+<h1 class="font-headline-md text-headline-md text-on-surface">Patient Roster</h1>
+<p class="text-on-surface-variant font-body-base">24 Active Patients assigned to you</p>
+</div>
+<div class="flex gap-2">
+<button class="p-2 bg-surface-container border border-outline-variant/30 rounded-lg text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">filter_list</span>
+</button>
+<button class="p-2 bg-surface-container border border-outline-variant/30 rounded-lg text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">sort</span>
+</button>
+</div>
+</div>
+<!-- Patient Table/List -->
+<div class="glass-panel rounded-2xl overflow-hidden teal-glow">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-high/50 border-b border-outline-variant/30">
+<th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant">Name</th>
+<th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant">Plan</th>
+<th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant">Last Session</th>
+<th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant">Progress</th>
+<th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant text-right">Alerts</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<!-- Row 1: Selected Patient -->
+<tr class="hover:bg-primary/5 transition-colors cursor-pointer border-l-4 border-primary bg-primary/5">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-secondary font-bold text-xs">MC</div>
+<span class="font-body-base font-semibold text-on-surface">Marcus Cooper</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="px-2 py-1 bg-surface-container-highest rounded text-[10px] font-label-caps text-secondary-fixed-dim">ACL REHAB</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-col">
+<span class="text-body-base">Oct 24, 2023</span>
+<span class="text-[10px] text-primary">94% Accuracy</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="sparkline-container relative">
+<svg class="w-full h-full" viewbox="0 0 80 24">
+<path d="M0 20 Q 10 18, 20 12 T 40 15 T 60 5 T 80 10" fill="none" stroke="#4fdbc8" stroke-width="2"></path>
+</svg>
+</div>
+</td>
+<td class="px-6 py-5 text-right">
+<span class="text-on-surface-variant text-sm">—</span>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-variant/30 transition-colors cursor-pointer">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface-variant font-bold text-xs">EL</div>
+<span class="font-body-base font-semibold text-on-surface">Elena Lopez</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="px-2 py-1 bg-surface-container-highest rounded text-[10px] font-label-caps text-tertiary">SPINAL ALIGN</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-col">
+<span class="text-body-base">Oct 22, 2023</span>
+<span class="text-[10px] text-error">72% Accuracy</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="sparkline-container relative">
+<svg class="w-full h-full opacity-60" viewbox="0 0 80 24">
+<path d="M0 10 Q 20 12, 40 22 T 80 18" fill="none" stroke="#ffb4ab" stroke-width="2"></path>
+</svg>
+</div>
+</td>
+<td class="px-6 py-5 text-right">
+<span class="px-2 py-1 bg-error-container/30 text-error rounded-full text-[10px] font-bold">Missed 2 sessions</span>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-variant/30 transition-colors cursor-pointer">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface-variant font-bold text-xs">JW</div>
+<span class="font-body-base font-semibold text-on-surface">James Wilson</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="px-2 py-1 bg-surface-container-highest rounded text-[10px] font-label-caps text-secondary-fixed-dim">ROTATOR CUFF</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-col">
+<span class="text-body-base">Oct 23, 2023</span>
+<span class="text-[10px] text-primary">88% Accuracy</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="sparkline-container relative">
+<svg class="w-full h-full" viewbox="0 0 80 24">
+<path d="M0 22 Q 20 15, 40 18 T 80 5" fill="none" stroke="#4fdbc8" stroke-width="2"></path>
+</svg>
+</div>
+</td>
+<td class="px-6 py-5 text-right">
+<span class="text-on-surface-variant text-sm">—</span>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-variant/30 transition-colors cursor-pointer">
+<td class="px-6 py-5">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface-variant font-bold text-xs">SB</div>
+<span class="font-body-base font-semibold text-on-surface">Sarah Bloom</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<span class="px-2 py-1 bg-surface-container-highest rounded text-[10px] font-label-caps text-secondary-fixed-dim">POST-OP KNEE</span>
+</td>
+<td class="px-6 py-5">
+<div class="flex flex-col">
+<span class="text-body-base">Oct 21, 2023</span>
+<span class="text-[10px] text-primary">91% Accuracy</span>
+</div>
+</td>
+<td class="px-6 py-5">
+<div class="sparkline-container relative">
+<svg class="w-full h-full" viewbox="0 0 80 24">
+<path d="M0 15 Q 15 10, 30 12 T 50 8 T 80 14" fill="none" stroke="#4fdbc8" stroke-width="2"></path>
+</svg>
+</div>
+</td>
+<td class="px-6 py-5 text-right">
+<span class="px-2 py-1 bg-tertiary-container/20 text-tertiary rounded-full text-[10px] font-bold">Incomplete set</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Right Column: Patient Detail View -->
+<div class="lg:w-2/5">
+<div class="glass-panel rounded-3xl p-stack-md sticky top-28 teal-glow">
+<!-- Patient Header -->
+<div class="flex justify-between items-start mb-stack-md">
+<div class="flex items-center gap-4">
+<img class="w-16 h-16 rounded-2xl object-cover border border-outline-variant/40" data-alt="A close-up portrait of a middle-aged male patient with a determined expression, lit with professional clinical lighting that emphasizes skin texture and subtle grey hair. The aesthetic is clean and modern, following the dark Slate-950 and Teal-500 brand colors. High fidelity, medical-grade visual style, 8k resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAglRuFsLlP_jdvWcQDLSooQ2HVS3ROJjsFTJGe5rOFIQjC2H7a4Y-ZwGxGimmBlaU2cu9-KFo4A78Cubf0-TKCflgKPoJvfcpr8okO0FD38w2rtNAfqSI78rnFw__sVayfW0nuXPhnXcytri9WlnSe8QFpOT4YJUxB2PjT7VH9Ba1JfRGTM2GzQKjH9te42qcanX2OXkm-ovVp4kjD2JfcpEICZdof2ei80fp8WAtCYO70HOZtTWVumA"/>
+<div>
+<h2 class="font-headline-md text-headline-md">Marcus Cooper</h2>
+<p class="text-on-surface-variant font-body-base flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+                                        Chicago, IL • 34 years old
+                                    </p>
+</div>
+</div>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<!-- Recovery Stats -->
+<div class="grid grid-cols-2 gap-4 mb-stack-lg">
+<div class="bg-surface-container p-4 rounded-2xl border border-outline-variant/10">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Recovery Progress</p>
+<div class="flex items-end gap-2">
+<span class="font-stat-value text-stat-value text-primary">68%</span>
+<span class="text-[10px] text-primary mb-1">+12% this week</span>
+</div>
+<div class="w-full bg-surface-variant h-1.5 rounded-full mt-3 overflow-hidden">
+<div class="bg-primary h-full rounded-full" style="width: 68%"></div>
+</div>
+</div>
+<div class="bg-surface-container p-4 rounded-2xl border border-outline-variant/10">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-1 uppercase">Avg. Accuracy</p>
+<div class="flex items-end gap-2">
+<span class="font-stat-value text-stat-value text-tertiary">91.4%</span>
+<span class="text-[10px] text-tertiary mb-1">Excellent</span>
+</div>
+<div class="w-full bg-surface-variant h-1.5 rounded-full mt-3 overflow-hidden">
+<div class="bg-tertiary h-full rounded-full" style="width: 91%"></div>
+</div>
+</div>
+</div>
+<!-- Recent Session Reports -->
+<div class="mb-stack-lg">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-label-caps text-label-caps text-on-surface font-bold">RECENT AI SESSIONS</h3>
+<a class="text-[10px] text-primary font-bold hover:underline" href="#">VIEW ALL</a>
+</div>
+<div class="space-y-3">
+<div class="flex items-center gap-4 p-3 bg-surface-container-low rounded-xl border border-outline-variant/5 hover:border-primary/30 transition-colors cursor-pointer group">
+<div class="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<div class="flex-1">
+<p class="text-body-base font-semibold group-hover:text-primary transition-colors">Session #12: Mobility Test</p>
+<p class="text-[10px] text-on-surface-variant">Oct 24 • 14 mins • 324 reps recorded</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</div>
+<div class="flex items-center gap-4 p-3 bg-surface-container-low rounded-xl border border-outline-variant/5 hover:border-primary/30 transition-colors cursor-pointer group">
+<div class="w-10 h-10 rounded-lg bg-surface-variant flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">video_library</span>
+</div>
+<div class="flex-1">
+<p class="text-body-base font-semibold group-hover:text-primary transition-colors">Session #11: Evening Routine</p>
+<p class="text-[10px] text-on-surface-variant">Oct 22 • 22 mins • 410 reps recorded</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</div>
+</div>
+</div>
+<!-- Quick Controls -->
+<div class="space-y-3">
+<button class="w-full bg-primary text-on-primary font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-3 hover:scale-[1.02] active:scale-95 transition-all shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined">add_circle</span>
+<span class="font-label-caps text-label-caps">Assign New Exercise</span>
+</button>
+<div class="grid grid-cols-2 gap-3">
+<button class="bg-surface-container-highest/50 border border-outline-variant/30 text-on-surface font-semibold py-3 px-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-sm">edit</span>
+<span class="text-[11px] font-label-caps">Modify Plan</span>
+</button>
+<button class="bg-surface-container-highest/50 border border-outline-variant/30 text-on-surface font-semibold py-3 px-4 rounded-2xl flex items-center justify-center gap-2 hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-sm">sticky_note_2</span>
+<span class="text-[11px] font-label-caps">Add Note</span>
+</button>
+</div>
+</div>
+<!-- Notes Section Overlay -->
+<div class="mt-8 pt-8 border-t border-outline-variant/20">
+<p class="text-[10px] text-on-surface-variant uppercase tracking-widest mb-3">Recent Clinical Note</p>
+<div class="bg-surface-container-low/50 p-4 rounded-xl italic text-on-surface-variant text-sm leading-relaxed">
+                                "Marcus is showing exceptional knee stability during lateral movements. Increased resistance bands for next set of squats. Patient reports minimal pain (2/10)."
+                            </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Nav for Mobile -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-surface-dim/95 backdrop-blur-lg border-t border-outline-variant/20 flex justify-around items-center z-50">
+<button class="flex flex-col items-center text-primary">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-label-caps">Home</span>
+</button>
+<button class="flex flex-col items-center text-on-surface-variant">
+<span class="material-symbols-outlined">people</span>
+<span class="text-[10px] font-label-caps">Patients</span>
+</button>
+<button class="flex flex-col items-center text-on-surface-variant">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[10px] font-label-caps">Stats</span>
+</button>
+<button class="flex flex-col items-center text-on-surface-variant">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-label-caps">Settings</span>
+</button>
+</nav>
+<script>
+        // Simple Interaction logic
+        document.querySelectorAll('tbody tr').forEach(row => {
+            row.addEventListener('click', () => {
+                // De-highlight others
+                document.querySelectorAll('tbody tr').forEach(r => {
+                    r.classList.remove('bg-primary/5', 'border-l-4', 'border-primary');
+                    r.classList.add('hover:bg-surface-variant/30');
+                });
+                // Highlight current
+                row.classList.add('bg-primary/5', 'border-l-4', 'border-primary');
+                row.classList.remove('hover:bg-surface-variant/30');
+            });
+        });
+    </script>
+</body></html>

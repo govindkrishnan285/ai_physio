@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Physio | Analytics Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#ffddb8",
+                    "on-primary": "#003731",
+                    "secondary-fixed-dim": "#bec6e0",
+                    "tertiary": "#ffb95f",
+                    "inverse-primary": "#006b5f",
+                    "surface-container-low": "#0d1c2d",
+                    "surface-container": "#122131",
+                    "surface-dim": "#051424",
+                    "surface": "#051424",
+                    "on-secondary-container": "#adb4ce",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "outline-variant": "#3c4947",
+                    "secondary-container": "#3f465c",
+                    "on-tertiary": "#472a00",
+                    "background": "#051424",
+                    "primary-fixed": "#71f8e4",
+                    "on-error-container": "#ffdad6",
+                    "on-error": "#690005",
+                    "error": "#ffb4ab",
+                    "surface-tint": "#4fdbc8",
+                    "on-secondary-fixed": "#131b2e",
+                    "secondary": "#bec6e0",
+                    "error-container": "#93000a",
+                    "on-surface-variant": "#bbcac6",
+                    "inverse-on-surface": "#233143",
+                    "surface-container-high": "#1c2b3c",
+                    "primary-fixed-dim": "#4fdbc8",
+                    "on-secondary-fixed-variant": "#3f465c",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "on-primary-container": "#00423b",
+                    "primary-container": "#14b8a6",
+                    "surface-bright": "#2c3a4c",
+                    "on-primary-fixed": "#00201c",
+                    "on-primary-fixed-variant": "#005048",
+                    "surface-container-highest": "#273647",
+                    "primary": "#4fdbc8",
+                    "outline": "#859490",
+                    "secondary-fixed": "#dae2fd",
+                    "on-tertiary-container": "#543300",
+                    "surface-variant": "#273647",
+                    "on-background": "#d4e4fa",
+                    "on-surface": "#d4e4fa",
+                    "tertiary-container": "#e49200",
+                    "on-secondary": "#283044",
+                    "surface-container-lowest": "#010f1f",
+                    "on-tertiary-fixed": "#2a1700",
+                    "inverse-surface": "#d4e4fa"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "margin-desktop": "40px",
+                    "stack-md": "24px",
+                    "container-max": "1280px",
+                    "stack-lg": "48px",
+                    "margin-mobile": "16px",
+                    "gutter": "24px",
+                    "stack-sm": "12px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "body-base": ["Inter"],
+                    "label-caps": ["JetBrains Mono"],
+                    "stat-value": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-base": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "stat-value": ["32px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #051424;
+            color: #d4e4fa;
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(18, 33, 49, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(60, 73, 71, 0.3);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+        .teal-glow {
+            filter: drop-shadow(0 0 8px rgba(79, 219, 200, 0.4));
+        }
+        .chart-gradient-fill {
+            fill: url(#chartGradient);
+            fill-opacity: 0.15;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body class="antialiased overflow-x-hidden">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 right-0 left-0 z-50 flex justify-between items-center px-margin-desktop h-20 bg-surface-dim/80 backdrop-blur-md border-b border-outline-variant/30">
+<div class="flex items-center gap-stack-md">
+<span class="font-headline-md text-headline-md font-bold text-primary">AI Physio</span>
+<nav class="hidden md:flex gap-6 ml-10">
+<a class="text-on-surface-variant hover:text-primary transition-colors font-label-caps text-label-caps" href="#">DASHBOARD</a>
+<a class="text-primary font-bold font-label-caps text-label-caps" href="#">ANALYTICS</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-label-caps text-label-caps" href="#">EXERCISES</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative hidden sm:block">
+<input class="bg-surface-variant/30 border border-outline-variant/50 rounded-full px-6 py-2 text-on-surface focus:outline-none focus:border-primary transition-all w-64 text-sm" placeholder="Search data..." type="text"/>
+<span class="material-symbols-outlined absolute right-4 top-2 text-on-surface-variant">search</span>
+</div>
+<button class="relative p-2 text-on-surface-variant hover:text-primary transition-colors active:scale-95 duration-100">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-primary/30">
+<img class="w-full h-full object-cover" data-alt="A professional close-up headshot of a middle-aged male physiotherapist with a friendly expression, wearing clinical scrubs, set against a blurred high-tech medical office background with soft teal and blue ambient lighting. The style is premium and clinical, matching the dark mode dashboard aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCK_wI2i_EpqJm4Sr0gc3pyLBqv1dI9I2M4e-PWnlDtdwCh25rJuG4NKvw7SfqSphUfhLBPwZORlZYNnT2NTExz5Tn54KmB2ZmvOfZYlNk3VW0AeeHb0oU6M2B223IYScNCdbqdNW6W20sbjS0cRxStfvDWjog2tRoZa47t6a7xw-9xiAmIdxTmaiLukVPEpgVmqnC3l658hl9raeTdbjJZKe1ExQayF6JpUdpfKD9ELfwNmtir86wxIQ"/>
+</div>
+</div>
+</header>
+<!-- Sidebar Navigation (Desktop) -->
+<aside class="fixed left-0 top-0 bottom-0 hidden lg:flex flex-col py-stack-lg w-64 z-40 bg-surface-container border-r border-outline-variant/20 pt-24">
+<div class="px-6 mb-10">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container text-sm">medical_services</span>
+</div>
+<div>
+<p class="font-label-caps text-label-caps text-on-surface">DR. SARAH CHEN</p>
+<p class="text-[10px] text-on-surface-variant tracking-wider">CLINICAL LEAD</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-2">
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-variant/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">DASHBOARD</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-variant/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">fitness_center</span>
+<span class="font-label-caps text-label-caps">EXERCISES</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-primary border-r-4 border-primary bg-primary/10 transition-transform translate-x-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">monitoring</span>
+<span class="font-label-caps text-label-caps">ANALYTICS</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-variant/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-caps text-label-caps">REPORTS</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-on-surface-variant hover:bg-surface-variant/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps">SETTINGS</span>
+</a>
+</nav>
+<div class="px-4 mt-auto">
+<button class="w-full bg-primary text-on-primary font-bold py-3 rounded-full flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 transition-all">
+<span class="material-symbols-outlined">play_circle</span>
+<span>START SESSION</span>
+</button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="lg:ml-64 pt-24 px-margin-mobile md:px-margin-desktop pb-10 min-h-screen relative">
+<!-- Atmospheric Background Shaders -->
+<div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+<div class="absolute -top-48 -right-48 w-96 h-96 bg-primary/5 blur-[120px] rounded-full"></div>
+<div class="absolute bottom-0 left-1/4 w-[600px] h-[600px] bg-secondary-container/10 blur-[150px] rounded-full"></div>
+</div>
+<!-- Dashboard Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+<div>
+<h1 class="font-display-lg text-display-lg text-on-surface mb-2">Progress Analytics</h1>
+<p class="text-on-surface-variant max-w-xl">Comprehensive insights into your biomechanical recovery. Track every rep, every angle, and every improvement with AI precision.</p>
+</div>
+<div class="flex bg-surface-container-high p-1 rounded-xl border border-outline-variant/30">
+<button class="px-6 py-2 rounded-lg bg-primary text-on-primary font-bold text-sm shadow-lg transition-all">Weekly</button>
+<button class="px-6 py-2 rounded-lg text-on-surface-variant hover:text-on-surface font-bold text-sm transition-all">Monthly</button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-gutter">
+<!-- Recovery Progress (Main Chart) -->
+<div class="lg:col-span-8 glass-card rounded-2xl p-6 flex flex-col">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-1">RECOVERY PROGRESS</h3>
+<p class="font-stat-value text-stat-value text-on-surface">84.2% <span class="text-primary text-sm font-normal ml-2">+12.5% vs last week</span></p>
+</div>
+<div class="flex gap-2">
+<span class="w-3 h-3 rounded-full bg-primary"></span>
+<span class="text-xs text-on-surface-variant">Knee Extension</span>
+</div>
+</div>
+<div class="flex-1 min-h-[300px] relative">
+<!-- SVG Line Chart Mockup -->
+<svg class="w-full h-full overflow-visible" viewbox="0 0 800 300">
+<defs>
+<lineargradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#4fdbc8"></stop>
+<stop offset="100%" stop-color="#4fdbc8" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<!-- Grid Lines -->
+<g class="stroke-outline-variant/10">
+<line x1="0" x2="800" y1="0" y2="0"></line>
+<line x1="0" x2="800" y1="60" y2="60"></line>
+<line x1="0" x2="800" y1="120" y2="120"></line>
+<line x1="0" x2="800" y1="180" y2="180"></line>
+<line x1="0" x2="800" y1="240" y2="240"></line>
+<line x1="0" x2="800" y1="300" y2="300"></line>
+</g>
+<!-- Area Fill -->
+<path class="chart-gradient-fill" d="M0,280 Q100,240 200,260 T400,180 T600,100 T800,40 L800,300 L0,300 Z"></path>
+<!-- Main Line -->
+<path class="teal-glow" d="M0,280 Q100,240 200,260 T400,180 T600,100 T800,40" fill="none" stroke="#4fdbc8" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"></path>
+<!-- Data Points -->
+<circle cx="200" cy="260" fill="#4fdbc8" r="4"></circle>
+<circle cx="400" cy="180" fill="#4fdbc8" r="4"></circle>
+<circle cx="600" cy="100" fill="#4fdbc8" r="4"></circle>
+<circle class="animate-pulse" cx="800" cy="40" fill="#4fdbc8" r="6"></circle>
+</svg>
+<!-- X-Axis Labels -->
+<div class="flex justify-between mt-4 text-on-surface-variant font-label-caps text-[10px]">
+<span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span>
+</div>
+</div>
+</div>
+<!-- Stats Column -->
+<div class="lg:col-span-4 flex flex-col gap-gutter">
+<!-- Range of Motion Tile -->
+<div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-primary text-3xl">cc_attribution</span>
+<span class="text-primary font-bold text-xs bg-primary/10 px-2 py-1 rounded">EXCELLENT</span>
+</div>
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-1">RANGE OF MOTION</h3>
+<div class="flex items-end gap-2">
+<span class="font-stat-value text-stat-value text-on-surface">142°</span>
+<span class="text-on-surface-variant pb-1">/ 160° Target</span>
+</div>
+<!-- Sparkline -->
+<div class="h-12 mt-4">
+<svg class="w-full h-full" viewbox="0 0 200 40">
+<path d="M0,35 L20,30 L40,32 L60,25 L80,28 L100,20 L120,22 L140,15 L160,18 L180,5 L200,8" fill="none" stroke="#4fdbc8" stroke-width="2"></path>
+</svg>
+</div>
+</div>
+<!-- Accuracy Trend Tile -->
+<div class="glass-card rounded-2xl p-6 relative overflow-hidden">
+<div class="flex justify-between items-start mb-4">
+<span class="material-symbols-outlined text-tertiary text-3xl">target</span>
+<span class="text-on-surface-variant text-xs">AI VERIFIED</span>
+</div>
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-1">FORM ACCURACY</h3>
+<span class="font-stat-value text-stat-value text-on-surface">96.8%</span>
+<div class="flex items-center gap-1 h-8 mt-4">
+<div class="flex-1 bg-primary h-2 rounded-full"></div>
+<div class="flex-1 bg-primary h-4 rounded-full"></div>
+<div class="flex-1 bg-primary h-6 rounded-full"></div>
+<div class="flex-1 bg-primary h-3 rounded-full"></div>
+<div class="flex-1 bg-primary h-5 rounded-full"></div>
+<div class="flex-1 bg-primary h-8 rounded-full"></div>
+<div class="flex-1 bg-primary h-7 rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Rep History (Horizontal Scroll/List) -->
+<div class="lg:col-span-6 glass-card rounded-2xl p-6">
+<div class="flex items-center justify-between mb-6">
+<h3 class="font-label-caps text-label-caps text-on-surface">SESSION LOG</h3>
+<a class="text-primary text-xs font-bold hover:underline" href="#">VIEW ALL</a>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container hover:bg-surface-variant/30 transition-colors border border-outline-variant/10">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-surface-variant/50 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">fitness_center</span>
+</div>
+<div>
+<p class="text-sm font-bold text-on-surface">Quadriceps Extension</p>
+<p class="text-xs text-on-surface-variant">12 Reps • 3 Sets • 15kg</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-xs font-label-caps text-primary">PERFECT FORM</p>
+<p class="text-[10px] text-on-surface-variant">Today, 10:42 AM</p>
+</div>
+</div>
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container hover:bg-surface-variant/30 transition-colors border border-outline-variant/10">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg bg-surface-variant/50 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary">fitness_center</span>
+</div>
+<div>
+<p class="text-sm font-bold text-on-surface">Standing Calf Raise</p>
+<p class="text-xs text-on-surface-variant">15 Reps • 4 Sets • Bodyweight</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-xs font-label-caps text-on-surface-variant">88% ACCURACY</p>
+<p class="text-[10px] text-on-surface-variant">Yesterday, 4:15 PM</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Goal Achievement Card -->
+<div class="lg:col-span-6 glass-card rounded-2xl p-6 flex flex-col items-center justify-center text-center relative overflow-hidden">
+<div class="absolute inset-0 opacity-10 pointer-events-none">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="none" r="40" stroke="#4fdbc8" stroke-dasharray="2,2" stroke-width="0.5"></circle>
+<circle cx="50" cy="50" fill="none" r="30" stroke="#4fdbc8" stroke-dasharray="2,2" stroke-width="0.5"></circle>
+</svg>
+</div>
+<div class="relative w-32 h-32 mb-6">
+<svg class="w-full h-full -rotate-90">
+<circle class="translate-x-[-16px] translate-y-[-16px]" cx="64" cy="64" fill="transparent" r="58" stroke="#122131" stroke-width="8"></circle>
+<circle class="translate-x-[-16px] translate-y-[-16px] teal-glow" cx="64" cy="64" fill="transparent" r="58" stroke="#4fdbc8" stroke-dasharray="364" stroke-dashoffset="91" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-2xl font-bold text-on-surface">75%</span>
+<span class="text-[10px] text-on-surface-variant">GOAL</span>
+</div>
+</div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2">Weekly Goal</h3>
+<p class="text-on-surface-variant text-sm mb-6 max-w-[240px]">You've completed 3 out of 4 prescribed sessions this week. Almost there!</p>
+<button class="px-8 py-2 border border-primary text-primary rounded-full hover:bg-primary/10 transition-all font-bold text-sm">
+                    VIEW MILESTONES
+                </button>
+</div>
+</div>
+<!-- FAB for Mobile (Implicitly defined context) -->
+<button class="fixed bottom-8 right-8 w-14 h-14 bg-primary text-on-primary rounded-full shadow-2xl flex items-center justify-center lg:hidden hover:scale-105 active:scale-95 transition-all z-50">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</main>
+<!-- Interactive Micro-Interactions Script -->
+<script>
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                card.style.setProperty('--mouse-x', `${x}px`);
+                card.style.setProperty('--mouse-y', `${y}px`);
+                
+                // Subtle tilt effect
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                const rotateX = (y - centerY) / 25;
+                const rotateY = (centerX - x) / 25;
+                
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg)`;
+            });
+        });
+
+        // Simple tab switcher logic
+        const tabBtns = document.querySelectorAll('.bg-surface-container-high button');
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabBtns.forEach(b => {
+                    b.classList.remove('bg-primary', 'text-on-primary');
+                    b.classList.add('text-on-surface-variant');
+                });
+                btn.classList.add('bg-primary', 'text-on-primary');
+                btn.classList.remove('text-on-surface-variant');
+            });
+        });
+    </script>
+</body></html>

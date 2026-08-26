@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Session Reports | AI Physio</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        :root {
+            --glass-bg: rgba(18, 33, 49, 0.7);
+            --glass-border: rgba(60, 73, 71, 0.3);
+            --teal-glow: rgba(79, 219, 200, 0.1);
+        }
+        body {
+            background-color: #051424;
+            font-family: 'Inter', sans-serif;
+            color: #d4e4fa;
+        }
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            border-color: #4fdbc8;
+            box-shadow: 0 0 20px var(--teal-glow);
+        }
+        .stat-glow {
+            text-shadow: 0 0 15px rgba(79, 219, 200, 0.4);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #0d1c2d;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #3c4947;
+            border-radius: 10px;
+        }
+        .active-tab-indicator {
+            box-shadow: 0 0 10px rgba(79, 219, 200, 0.3);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-fixed": "#ffddb8",
+                      "on-primary": "#003731",
+                      "secondary-fixed-dim": "#bec6e0",
+                      "tertiary": "#ffb95f",
+                      "inverse-primary": "#006b5f",
+                      "surface-container-low": "#0d1c2d",
+                      "surface-container": "#122131",
+                      "surface-dim": "#051424",
+                      "surface": "#051424",
+                      "on-secondary-container": "#adb4ce",
+                      "tertiary-fixed-dim": "#ffb95f",
+                      "outline-variant": "#3c4947",
+                      "secondary-container": "#3f465c",
+                      "on-tertiary": "#472a00",
+                      "background": "#051424",
+                      "primary-fixed": "#71f8e4",
+                      "on-error-container": "#ffdad6",
+                      "on-error": "#690005",
+                      "error": "#ffb4ab",
+                      "surface-tint": "#4fdbc8",
+                      "on-secondary-fixed": "#131b2e",
+                      "secondary": "#bec6e0",
+                      "error-container": "#93000a",
+                      "on-surface-variant": "#bbcac6",
+                      "inverse-on-surface": "#233143",
+                      "surface-container-high": "#1c2b3c",
+                      "primary-fixed-dim": "#4fdbc8",
+                      "on-secondary-fixed-variant": "#3f465c",
+                      "on-tertiary-fixed-variant": "#653e00",
+                      "on-primary-container": "#00423b",
+                      "primary-container": "#14b8a6",
+                      "surface-bright": "#2c3a4c",
+                      "on-primary-fixed": "#00201c",
+                      "on-primary-fixed-variant": "#005048",
+                      "surface-container-highest": "#273647",
+                      "primary": "#4fdbc8",
+                      "outline": "#859490",
+                      "secondary-fixed": "#dae2fd",
+                      "on-tertiary-container": "#543300",
+                      "surface-variant": "#273647",
+                      "on-background": "#d4e4fa",
+                      "on-surface": "#d4e4fa",
+                      "tertiary-container": "#e49200",
+                      "on-secondary": "#283044",
+                      "surface-container-lowest": "#010f1f",
+                      "on-tertiary-fixed": "#2a1700",
+                      "inverse-surface": "#d4e4fa"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "unit": "4px",
+                      "margin-desktop": "40px",
+                      "stack-md": "24px",
+                      "container-max": "1280px",
+                      "stack-lg": "48px",
+                      "margin-mobile": "16px",
+                      "gutter": "24px",
+                      "stack-sm": "12px"
+              },
+              "fontFamily": {
+                      "headline-md": ["Inter"],
+                      "display-lg-mobile": ["Inter"],
+                      "body-base": ["Inter"],
+                      "display-lg": ["Inter"],
+                      "label-caps": ["JetBrains Mono"],
+                      "stat-value": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-base": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "stat-value": ["32px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background min-h-screen flex">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 bottom-0 flex flex-col py-stack-md w-64 z-40 bg-surface-container border-r border-outline-variant/20 hidden md:flex">
+<div class="px-6 mb-10">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">AI Physio</h1>
+</div>
+<div class="flex flex-col gap-1 flex-grow">
+<a class="flex items-center px-6 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-3">dashboard</span>
+<span class="font-label-caps text-label-caps uppercase tracking-widest">Dashboard</span>
+</a>
+<a class="flex items-center px-6 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-3">fitness_center</span>
+<span class="font-label-caps text-label-caps uppercase tracking-widest">Exercises</span>
+</a>
+<a class="flex items-center px-6 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-3">monitoring</span>
+<span class="font-label-caps text-label-caps uppercase tracking-widest">Analytics</span>
+</a>
+<a class="flex items-center px-6 py-3 text-primary border-r-4 border-primary bg-primary/10 translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined mr-3">description</span>
+<span class="font-label-caps text-label-caps uppercase tracking-widest">Reports</span>
+</a>
+<a class="flex items-center px-6 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-3">notifications</span>
+<span class="font-label-caps text-label-caps uppercase tracking-widest">Notifications</span>
+</a>
+<a class="flex items-center px-6 py-3 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-3">settings</span>
+<span class="font-label-caps text-label-caps uppercase tracking-widest">Settings</span>
+</a>
+</div>
+<div class="px-6 mt-auto pt-6 border-t border-outline-variant/10">
+<div class="flex items-center gap-3 mb-6">
+<div class="w-10 h-10 rounded-full bg-primary-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a clinical lead doctor with a warm smile, wearing a modern white lab coat against a soft teal background. The image is crisp and clinical with high-end photographic quality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAoUDTI4fLenco6msOokAa9BVhsl7jKeVPt3Em4rOKgkpopqKDgSYlyfvJ7YVnvSUNkgIdo3IEk_oJIJV4st2Ysh-PGF_2wneqpcN4AxetL7wvAwF2VRq-S8Miivw4t64vDwcoK-pkdz2RxCXfrnZuOhrvf-7peyUM_BKyGYdLLfEk3-6pZMkJzBQi199P_X3mu2-DjaJEXFEqdUZCpj3aSmCQEEAW2gCYKRX5gXwNbeJuCz05q06uVjQ"/>
+</div>
+<div>
+<p class="font-body-base text-body-base font-semibold">Dr. Sarah Chen</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-tighter">Clinical Lead</p>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary font-bold py-3 px-4 rounded-full hover:brightness-110 transition-all active:scale-95">
+                Start Session
+            </button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-grow md:ml-64 relative pb-20">
+<!-- TopAppBar -->
+<header class="fixed top-0 right-0 left-0 md:left-64 z-50 flex justify-between items-center px-8 h-20 bg-surface-dim/80 backdrop-blur-md border-b border-outline-variant/30">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary md:hidden">menu</span>
+<h2 class="font-headline-md text-headline-md text-on-surface font-bold">Session Reports</h2>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-sm">search</span>
+<input class="bg-surface-container-high border-none rounded-full pl-10 pr-4 py-2 text-sm w-64 focus:ring-1 focus:ring-primary" placeholder="Search sessions..." type="text"/>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">notifications</button>
+<div class="w-10 h-10 rounded-full border-2 border-primary/20 p-0.5">
+<img class="w-full h-full rounded-full object-cover" data-alt="User profile avatar featuring a young athletic person in a dark room with subtle teal accent lighting on their face. High-fidelity cinematic photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnJg2B4LFdU2FMGmFZaBVqoqiLqTyicWkHkTF4gn-UxZ-h7HkQ8NXHUwb9BzwzGAgIVJVMDMe3GPdR-YL8mMH8pyj6X0FismNItrozQgK8SdKdbFB8I_760cfnq3sMAP0-SMeirAtBnImd8IbLkufBrUaDnEuGORQirRzPfDrgh6V6d6hj2MSj-Wk2ucGNcJu0oEETz1hPe5mCtwKszL3hytnp5GhnO9VIsTCPMOdotHjeJrYUGu8gOA"/>
+</div>
+</div>
+</div>
+</header>
+<div class="mt-24 px-8 max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 h-[calc(100vh-120px)]">
+<!-- Report List Panel -->
+<section class="lg:col-span-4 flex flex-col gap-4 overflow-hidden">
+<div class="flex justify-between items-end mb-2">
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase">Recent History</p>
+<button class="text-primary text-xs font-semibold hover:underline">Filter By Date</button>
+</div>
+<div class="flex-grow overflow-y-auto custom-scrollbar flex flex-col gap-3 pr-2">
+<!-- Session Card 1 (Active) -->
+<div class="glass-card p-4 rounded-xl border-primary bg-primary/5 active-tab-indicator relative overflow-hidden cursor-pointer group">
+<div class="flex justify-between items-start relative z-10">
+<div>
+<h4 class="font-body-base font-bold text-on-surface">Weighted Squats</h4>
+<p class="text-xs text-on-surface-variant">Today • 14:22 PM</p>
+</div>
+<div class="bg-primary/20 text-primary px-2 py-1 rounded text-[10px] font-bold tracking-widest uppercase">92% Acc</div>
+</div>
+<div class="mt-3 flex gap-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">timer</span>
+<span class="text-xs text-on-surface-variant">15:00</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">repeat</span>
+<span class="text-xs text-on-surface-variant">36 Reps</span>
+</div>
+</div>
+</div>
+<!-- Session Card 2 -->
+<div class="glass-card p-4 rounded-xl cursor-pointer group">
+<div class="flex justify-between items-start">
+<div>
+<h4 class="font-body-base font-bold text-on-surface">Lumbar Mobility</h4>
+<p class="text-xs text-on-surface-variant">Oct 24, 2023 • 09:15 AM</p>
+</div>
+<div class="bg-surface-variant text-on-surface-variant px-2 py-1 rounded text-[10px] font-bold tracking-widest uppercase">88% Acc</div>
+</div>
+<div class="mt-3 flex gap-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">timer</span>
+<span class="text-xs text-on-surface-variant">10:00</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">repeat</span>
+<span class="text-xs text-on-surface-variant">20 Reps</span>
+</div>
+</div>
+</div>
+<!-- Session Card 3 -->
+<div class="glass-card p-4 rounded-xl cursor-pointer group">
+<div class="flex justify-between items-start">
+<div>
+<h4 class="font-body-base font-bold text-on-surface">Hip Flexor Stretch</h4>
+<p class="text-xs text-on-surface-variant">Oct 22, 2023 • 18:45 PM</p>
+</div>
+<div class="bg-surface-variant text-on-surface-variant px-2 py-1 rounded text-[10px] font-bold tracking-widest uppercase">95% Acc</div>
+</div>
+<div class="mt-3 flex gap-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">timer</span>
+<span class="text-xs text-on-surface-variant">08:00</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">repeat</span>
+<span class="text-xs text-on-surface-variant">12 Reps</span>
+</div>
+</div>
+</div>
+<!-- Session Card 4 -->
+<div class="glass-card p-4 rounded-xl cursor-pointer group">
+<div class="flex justify-between items-start">
+<div>
+<h4 class="font-body-base font-bold text-on-surface">Shoulder Abduction</h4>
+<p class="text-xs text-on-surface-variant">Oct 20, 2023 • 11:30 AM</p>
+</div>
+<div class="bg-surface-variant text-on-surface-variant px-2 py-1 rounded text-[10px] font-bold tracking-widest uppercase">81% Acc</div>
+</div>
+<div class="mt-3 flex gap-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">timer</span>
+<span class="text-xs text-on-surface-variant">12:00</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-on-surface-variant">repeat</span>
+<span class="text-xs text-on-surface-variant">30 Reps</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Expanded Detail Panel -->
+<section class="lg:col-span-8 overflow-y-auto custom-scrollbar flex flex-col gap-6 pr-2">
+<!-- Session Header Card -->
+<div class="glass-card rounded-2xl p-8 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
+<div>
+<span class="font-label-caps text-label-caps text-primary uppercase mb-2 block tracking-widest">Active Report Analysis</span>
+<h3 class="font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface mb-2">Weighted Squats</h3>
+<div class="flex items-center gap-4 text-on-surface-variant">
+<p class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">calendar_today</span> Oct 25, 2023</p>
+<p class="flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> 14:22 PM</p>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<div class="text-center">
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">Duration</p>
+<p class="font-stat-value text-stat-value text-on-surface">15:00</p>
+</div>
+<div class="w-px h-12 bg-outline-variant/30"></div>
+<div class="text-center">
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-1">Accuracy</p>
+<p class="font-stat-value text-stat-value text-primary stat-glow">92%</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Bento Grid Metrics -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Average ROM -->
+<div class="glass-card rounded-2xl p-6 flex flex-col justify-between min-h-[140px]">
+<div class="flex justify-between items-center">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Avg. Range of Motion</span>
+<span class="material-symbols-outlined text-primary text-xl">straighten</span>
+</div>
+<div>
+<p class="font-stat-value text-stat-value text-on-surface">110°</p>
+<p class="text-[10px] text-primary mt-1 font-bold">+5° from last session</p>
+</div>
+</div>
+<!-- Total Reps -->
+<div class="glass-card rounded-2xl p-6 flex flex-col justify-between min-h-[140px]">
+<div class="flex justify-between items-center">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Total Reps</span>
+<span class="material-symbols-outlined text-primary text-xl">rebase_edit</span>
+</div>
+<div>
+<p class="font-stat-value text-stat-value text-on-surface">36</p>
+<p class="text-[10px] text-on-surface-variant mt-1">Goal: 30</p>
+</div>
+</div>
+<!-- Intensity -->
+<div class="glass-card rounded-2xl p-6 flex flex-col justify-between min-h-[140px]">
+<div class="flex justify-between items-center">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Peak Intensity</span>
+<span class="material-symbols-outlined text-primary text-xl">bolt</span>
+</div>
+<div>
+<p class="font-stat-value text-stat-value text-on-surface">High</p>
+<p class="text-[10px] text-secondary mt-1 font-bold">142 BPM Peak</p>
+</div>
+</div>
+</div>
+<!-- AI Insights & Posture Visualization -->
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+<!-- Insights -->
+<div class="glass-card rounded-2xl p-8 border-l-4 border-l-primary">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-primary">psychology</span>
+<h4 class="font-headline-md text-headline-md text-on-surface">AI Insights</h4>
+</div>
+<ul class="flex flex-col gap-4">
+<li class="flex gap-4">
+<span class="material-symbols-outlined text-primary mt-1" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<p class="font-body-base text-body-base text-on-surface-variant leading-relaxed">
+<span class="text-on-surface font-semibold">Perfect Form:</span> Form remained stable through the first 2 sets. Center of gravity was perfectly balanced.
+                                </p>
+</li>
+<li class="flex gap-4">
+<span class="material-symbols-outlined text-tertiary mt-1" style="font-variation-settings: 'FILL' 1;">warning</span>
+<p class="font-body-base text-body-base text-on-surface-variant leading-relaxed">
+<span class="text-tertiary font-semibold">Knee Valgus detected:</span> Minor knee caving observed in final 4 reps. Fatigue is likely affecting stabilization.
+                                </p>
+</li>
+<li class="flex gap-4">
+<span class="material-symbols-outlined text-secondary mt-1" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+<p class="font-body-base text-body-base text-on-surface-variant leading-relaxed">
+<span class="text-secondary font-semibold">Recommendation:</span> Incorporate 3x10 lateral band walks to strengthen hip abductors before next squat session.
+                                </p>
+</li>
+</ul>
+</div>
+<!-- Joint Angle Visualization -->
+<div class="glass-card rounded-2xl p-8 flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<h4 class="font-headline-md text-headline-md text-on-surface">Posture Summary</h4>
+<span class="font-label-caps text-label-caps text-on-surface-variant">LOWER BODY FOCUS</span>
+</div>
+<div class="flex-grow flex items-center justify-center relative min-h-[220px]">
+<!-- Skeleton Visualization Placeholder -->
+<div class="absolute inset-0 bg-gradient-to-t from-primary/10 to-transparent rounded-xl flex items-center justify-center border border-primary/10">
+<div class="w-full h-full p-4 flex flex-col items-center justify-center relative">
+<!-- Simple SVG skeleton mimic -->
+<svg class="w-48 h-48 text-primary" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 100 100">
+<circle cx="50" cy="15" r="5" stroke-dasharray="2 2"></circle>
+<path d="M50 20 L50 45" stroke-dasharray="2 2"></path>
+<path d="M35 30 L65 30" stroke-dasharray="2 2"></path>
+<!-- Knees bending -->
+<path class="text-tertiary" d="M50 45 L35 65 L40 85" stroke-width="3"></path>
+<path d="M50 45 L65 65 L60 85" stroke-width="3"></path>
+<!-- Joint Labels -->
+<circle class="animate-pulse" cx="35" cy="65" fill="#ffb95f" r="3"></circle>
+<circle cx="65" cy="65" fill="currentColor" r="3"></circle>
+</svg>
+<!-- Angle Tags -->
+<div class="absolute top-1/2 left-10 bg-surface-container-highest border border-tertiary/40 px-2 py-1 rounded text-[10px] text-tertiary">
+                                        Angle: 102° (Knee Valgus)
+                                    </div>
+<div class="absolute bottom-10 right-4 bg-surface-container-highest border border-primary/40 px-2 py-1 rounded text-[10px] text-primary">
+                                        Hip Stability: Stable
+                                    </div>
+</div>
+</div>
+</div>
+<div class="mt-4 flex justify-between gap-4">
+<button class="flex-grow text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors py-2 border border-outline-variant/30 rounded-lg">View Heatmap</button>
+<button class="flex-grow text-[10px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors py-2 border border-outline-variant/30 rounded-lg">Compare Previous</button>
+</div>
+</div>
+</div>
+<!-- Session Timeline -->
+<div class="glass-card rounded-2xl p-8 mb-8">
+<div class="flex justify-between items-center mb-8">
+<h4 class="font-headline-md text-headline-md text-on-surface">Performance Timeline</h4>
+<div class="flex gap-2">
+<span class="w-3 h-3 bg-primary rounded-full"></span>
+<span class="text-[10px] text-on-surface-variant uppercase tracking-widest">Accuracy %</span>
+</div>
+</div>
+<div class="h-48 w-full relative flex items-end justify-between gap-1">
+<!-- Bar chart simulation -->
+<div class="w-full h-full absolute flex flex-col justify-between pointer-events-none opacity-20">
+<div class="w-full border-b border-outline-variant"></div>
+<div class="w-full border-b border-outline-variant"></div>
+<div class="w-full border-b border-outline-variant"></div>
+<div class="w-full border-b border-outline-variant"></div>
+</div>
+<div class="bg-primary/40 hover:bg-primary transition-all rounded-t-sm w-4" style="height: 95%;"></div>
+<div class="bg-primary/40 hover:bg-primary transition-all rounded-t-sm w-4" style="height: 92%;"></div>
+<div class="bg-primary/40 hover:bg-primary transition-all rounded-t-sm w-4" style="height: 88%;"></div>
+<div class="bg-primary/40 hover:bg-primary transition-all rounded-t-sm w-4" style="height: 94%;"></div>
+<div class="bg-primary/40 hover:bg-primary transition-all rounded-t-sm w-4" style="height: 98%;"></div>
+<div class="bg-primary/40 hover:bg-primary transition-all rounded-t-sm w-4" style="height: 91%;"></div>
+<div class="bg-primary/40 hover:bg-primary transition-all rounded-t-sm w-4" style="height: 85%;"></div>
+<div class="bg-primary/40 hover:bg-primary transition-all rounded-t-sm w-4" style="height: 82%;"></div>
+<div class="bg-primary/40 hover:bg-primary transition-all rounded-t-sm w-4" style="height: 75%;"></div>
+<div class="bg-primary/40 hover:bg-primary transition-all rounded-t-sm w-4" style="height: 78%;"></div>
+<div class="bg-primary/40 hover:bg-primary transition-all rounded-t-sm w-4" style="height: 92%;"></div>
+<div class="bg-primary/40 hover:bg-primary transition-all rounded-t-sm w-4" style="height: 96%;"></div>
+<div class="bg-primary/40 hover:bg-primary transition-all rounded-t-sm w-4" style="height: 89%;"></div>
+<div class="bg-primary/40 hover:bg-primary transition-all rounded-t-sm w-4" style="height: 84%;"></div>
+<div class="bg-tertiary/60 hover:bg-tertiary transition-all rounded-t-sm w-4" style="height: 62%;"></div>
+<div class="bg-tertiary/60 hover:bg-tertiary transition-all rounded-t-sm w-4" style="height: 55%;"></div>
+<div class="bg-tertiary/60 hover:bg-tertiary transition-all rounded-t-sm w-4" style="height: 48%;"></div>
+</div>
+<div class="flex justify-between mt-4 text-[10px] text-on-surface-variant uppercase font-bold tracking-widest">
+<span>Set 1</span>
+<span>Set 2</span>
+<span>Set 3 (Fatigue Zone)</span>
+</div>
+</div>
+</section>
+</div>
+<!-- FAB (Only for specific contexts, but adding for aesthetic 'Start' intent on reports page) -->
+<button class="fixed bottom-8 right-8 w-16 h-16 bg-primary text-on-primary rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+</main>
+<!-- Mobile Bottom Navigation (Visible only on small screens) -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-surface-container border-t border-outline-variant/20 flex items-center justify-around z-50">
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px]">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">fitness_center</span>
+<span class="text-[10px]">Training</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">description</span>
+<span class="text-[10px]">Reports</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px]">Profile</span>
+</a>
+</nav>
+<script>
+        // Simple Micro-interactions for interactivity
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.addEventListener('mousedown', () => {
+                card.style.transform = 'scale(0.98)';
+            });
+            card.addEventListener('mouseup', () => {
+                card.style.transform = 'scale(1)';
+            });
+        });
+
+        // Hover effect for the chart bars
+        const bars = document.querySelectorAll('.bg-primary\\/40, .bg-tertiary\\/60');
+        bars.forEach(bar => {
+            bar.addEventListener('mouseenter', () => {
+                bar.classList.add('shadow-[0_0_15px_rgba(79,219,200,0.4)]');
+            });
+            bar.addEventListener('mouseleave', () => {
+                bar.classList.remove('shadow-[0_0_15px_rgba(79,219,200,0.4)]');
+            });
+        });
+    </script>
+</body></html>

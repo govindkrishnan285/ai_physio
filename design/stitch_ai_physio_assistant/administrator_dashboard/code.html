@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Physio | Admin Console</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#ffddb8",
+                        "on-primary": "#003731",
+                        "secondary-fixed-dim": "#bec6e0",
+                        "tertiary": "#ffb95f",
+                        "inverse-primary": "#006b5f",
+                        "surface-container-low": "#0d1c2d",
+                        "surface-container": "#122131",
+                        "surface-dim": "#051424",
+                        "surface": "#051424",
+                        "on-secondary-container": "#adb4ce",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "outline-variant": "#3c4947",
+                        "secondary-container": "#3f465c",
+                        "on-tertiary": "#472a00",
+                        "background": "#051424",
+                        "primary-fixed": "#71f8e4",
+                        "on-error-container": "#ffdad6",
+                        "on-error": "#690005",
+                        "error": "#ffb4ab",
+                        "surface-tint": "#4fdbc8",
+                        "on-secondary-fixed": "#131b2e",
+                        "secondary": "#bec6e0",
+                        "error-container": "#93000a",
+                        "on-surface-variant": "#bbcac6",
+                        "inverse-on-surface": "#233143",
+                        "surface-container-high": "#1c2b3c",
+                        "primary-fixed-dim": "#4fdbc8",
+                        "on-secondary-fixed-variant": "#3f465c",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "on-primary-container": "#00423b",
+                        "primary-container": "#14b8a6",
+                        "surface-bright": "#2c3a4c",
+                        "on-primary-fixed": "#00201c",
+                        "on-primary-fixed-variant": "#005048",
+                        "surface-container-highest": "#273647",
+                        "primary": "#4fdbc8",
+                        "outline": "#859490",
+                        "secondary-fixed": "#dae2fd",
+                        "on-tertiary-container": "#543300",
+                        "surface-variant": "#273647",
+                        "on-background": "#d4e4fa",
+                        "on-surface": "#d4e4fa",
+                        "tertiary-container": "#e49200",
+                        "on-secondary": "#283044",
+                        "surface-container-lowest": "#010f1f",
+                        "on-tertiary-fixed": "#2a1700",
+                        "inverse-surface": "#d4e4fa"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "margin-desktop": "40px",
+                        "stack-md": "24px",
+                        "container-max": "1280px",
+                        "stack-lg": "48px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "stack-sm": "12px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "body-base": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "label-caps": ["JetBrains Mono"],
+                        "stat-value": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-base": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "stat-value": ["32px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #051424;
+            color: #d4e4fa;
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(18, 33, 49, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(60, 73, 71, 0.3);
+        }
+        .teal-glow {
+            box-shadow: 0 0 20px rgba(79, 219, 200, 0.05);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #051424;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #3c4947;
+            border-radius: 10px;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="overflow-hidden">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 right-0 left-0 z-50 flex justify-between items-center px-margin-desktop h-20 bg-surface-dim/80 backdrop-blur-md border-b border-outline-variant/30">
+<div class="flex items-center gap-4">
+<span class="font-headline-md text-headline-md font-bold text-primary">AI Physio</span>
+<div class="hidden md:flex ml-8 items-center bg-surface-container rounded-full px-4 py-1.5 border border-outline-variant/20">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-base placeholder:text-on-surface-variant w-64" placeholder="Search system logs, users, exercises..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="relative hover:bg-surface-variant/50 p-2 rounded-full transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full"></span>
+</button>
+<div class="flex items-center gap-3 pl-6 border-l border-outline-variant/30">
+<div class="text-right hidden sm:block">
+<p class="font-label-caps text-label-caps text-on-surface">Dr. Sarah Chen</p>
+<p class="text-[10px] text-on-surface-variant uppercase tracking-widest">Administrator</p>
+</div>
+<div class="w-10 h-10 rounded-full border-2 border-primary overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional studio portrait of a female medical professional with a clinical, modern look. She has a confident expression, set against a dark, tech-focused background with subtle teal lighting accents that match a premium health-tech aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNcAkI_gTD5hIaGfJmi9b3T_q9bFxGr5-mZvGGYm99N1A3RT5WD15BABF4cus89IC5ixdiIZ_OlaQLduNFJsh7XO0yHnmPy937tWHmxzLypq7PyDvqDX7dFNk5dLDMsPnR3m1fHtUQX-bX8Oyxd2FYM1xzJ496vX20Vl1hA7cVvFcLTRp9zopzT6-BhXpomkyEo21idCSc-RZmSVnZAl1MOD4f7fF3Aoh-gXx86nUCvq-njqsnVwSFfQ"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Side Navigation Bar -->
+<aside class="fixed left-0 top-0 bottom-0 flex flex-col py-stack-md w-64 z-40 bg-surface-container border-r border-outline-variant/20 mt-20">
+<nav class="flex-1 px-4 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-primary border-r-4 border-primary bg-primary/10 translate-x-1 transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 transition-all" href="#">
+<span class="material-symbols-outlined">fitness_center</span>
+<span class="font-label-caps text-label-caps">Exercises</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 transition-all" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="font-label-caps text-label-caps">Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 transition-all" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-caps text-label-caps">Reports</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 transition-all" href="#">
+<span class="material-symbols-outlined">notifications</span>
+<span class="font-label-caps text-label-caps">Notifications</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+</nav>
+<div class="px-6 py-6 border-t border-outline-variant/20">
+<button class="w-full bg-primary text-on-primary font-bold py-3 px-4 rounded-full flex items-center justify-center gap-2 hover:scale-[0.98] transition-transform">
+<span class="material-symbols-outlined">play_circle</span>
+<span>Start Session</span>
+</button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-64 mt-20 p-8 h-[calc(100vh-80px)] overflow-y-auto custom-scrollbar">
+<div class="max-w-container-max mx-auto space-y-stack-lg">
+<!-- Page Header -->
+<div class="flex justify-between items-end">
+<div>
+<h1 class="font-display-lg text-display-lg text-on-surface">Global Overview</h1>
+<p class="text-on-surface-variant font-body-base">System status and key performance indicators.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-2 bg-surface-container-high text-on-surface border border-outline-variant/30 rounded-lg flex items-center gap-2 hover:bg-surface-bright transition-colors">
+<span class="material-symbols-outlined text-[18px]">download</span>
+<span class="font-label-caps text-[10px]">Export Data</span>
+</button>
+<button class="px-4 py-2 bg-primary/20 text-primary border border-primary/30 rounded-lg flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] animate-pulse">sensors</span>
+<span class="font-label-caps text-[10px]">Live Monitoring</span>
+</button>
+</div>
+</div>
+<!-- Stats Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Total Users -->
+<div class="glass-panel p-6 rounded-2xl flex flex-col justify-between teal-glow">
+<div class="flex justify-between items-start">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Total Users</span>
+<span class="material-symbols-outlined text-primary">groups</span>
+</div>
+<div class="mt-4">
+<span class="font-stat-value text-stat-value text-on-surface">12,842</span>
+<div class="flex items-center gap-1 text-primary text-[12px] mt-1">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+<span>+14% this month</span>
+</div>
+</div>
+</div>
+<!-- Active Therapists -->
+<div class="glass-panel p-6 rounded-2xl flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Active Therapists</span>
+<span class="material-symbols-outlined text-tertiary">medical_services</span>
+</div>
+<div class="mt-4">
+<span class="font-stat-value text-stat-value text-on-surface">458</span>
+<div class="flex items-center gap-1 text-on-surface-variant text-[12px] mt-1">
+<span>Currently Online: 124</span>
+</div>
+</div>
+</div>
+<!-- Exercises Library -->
+<div class="glass-panel p-6 rounded-2xl flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Library Size</span>
+<span class="material-symbols-outlined text-secondary">fitness_center</span>
+</div>
+<div class="mt-4">
+<span class="font-stat-value text-stat-value text-on-surface">1,024</span>
+<div class="flex items-center gap-1 text-on-surface-variant text-[12px] mt-1">
+<span>42 New items pending review</span>
+</div>
+</div>
+</div>
+<!-- System Health -->
+<div class="glass-panel p-6 rounded-2xl flex flex-col justify-between">
+<div class="flex justify-between items-start">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Model Latency</span>
+<span class="material-symbols-outlined text-primary">bolt</span>
+</div>
+<div class="mt-4">
+<span class="font-stat-value text-stat-value text-on-surface">42ms</span>
+<div class="w-full bg-surface-container-highest h-1 rounded-full mt-2 overflow-hidden">
+<div class="bg-primary h-full w-[85%] rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<!-- User Management Table -->
+<div class="lg:col-span-2 glass-panel rounded-2xl overflow-hidden">
+<div class="p-6 border-b border-outline-variant/30 flex justify-between items-center">
+<h2 class="font-headline-md text-headline-md text-on-surface">User Management</h2>
+<div class="flex gap-2">
+<button class="bg-surface-variant/30 hover:bg-surface-variant/50 p-2 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[20px]">filter_list</span>
+</button>
+<button class="bg-surface-variant/30 hover:bg-surface-variant/50 p-2 rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-high">
+<th class="p-4 font-label-caps text-label-caps text-on-surface-variant">Name</th>
+<th class="p-4 font-label-caps text-label-caps text-on-surface-variant">Role</th>
+<th class="p-4 font-label-caps text-label-caps text-on-surface-variant">Status</th>
+<th class="p-4 font-label-caps text-label-caps text-on-surface-variant">Last Session</th>
+<th class="p-4"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<tr class="hover:bg-surface-variant/20 transition-colors group">
+<td class="p-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary text-[12px] font-bold">JD</div>
+<div>
+<p class="text-body-base font-semibold">Jameson Dunn</p>
+<p class="text-[12px] text-on-surface-variant">jdunn@example.com</p>
+</div>
+</div>
+</td>
+<td class="p-4 text-body-base">Patient</td>
+<td class="p-4">
+<span class="px-2 py-0.5 rounded-full text-[10px] bg-primary/10 text-primary border border-primary/20 uppercase tracking-tighter">Active</span>
+</td>
+<td class="p-4 text-body-base text-on-surface-variant">2h ago</td>
+<td class="p-4 text-right">
+<button class="opacity-0 group-hover:opacity-100 text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-variant/20 transition-colors group">
+<td class="p-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center text-secondary text-[12px] font-bold">MK</div>
+<div>
+<p class="text-body-base font-semibold">Maya Kapoor</p>
+<p class="text-[12px] text-on-surface-variant">maya.k@clinic.org</p>
+</div>
+</div>
+</td>
+<td class="p-4 text-body-base">Therapist</td>
+<td class="p-4">
+<span class="px-2 py-0.5 rounded-full text-[10px] bg-primary/10 text-primary border border-primary/20 uppercase tracking-tighter">Active</span>
+</td>
+<td class="p-4 text-body-base text-on-surface-variant">5m ago</td>
+<td class="p-4 text-right">
+<button class="opacity-0 group-hover:opacity-100 text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-variant/20 transition-colors group">
+<td class="p-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-tertiary/20 flex items-center justify-center text-tertiary text-[12px] font-bold">LW</div>
+<div>
+<p class="text-body-base font-semibold">Lucas White</p>
+<p class="text-[12px] text-on-surface-variant">lwhite@provider.net</p>
+</div>
+</div>
+</td>
+<td class="p-4 text-body-base">Patient</td>
+<td class="p-4">
+<span class="px-2 py-0.5 rounded-full text-[10px] bg-outline-variant/30 text-on-surface-variant border border-outline-variant/50 uppercase tracking-tighter">Inactive</span>
+</td>
+<td class="p-4 text-body-base text-on-surface-variant">12d ago</td>
+<td class="p-4 text-right">
+<button class="opacity-0 group-hover:opacity-100 text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- System Status Column -->
+<div class="space-y-gutter">
+<div class="glass-panel p-6 rounded-2xl">
+<div class="flex justify-between items-center mb-4">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant">AI Model Status</h3>
+<span class="flex items-center gap-1.5 text-primary text-[10px] font-bold">
+<span class="w-1.5 h-1.5 bg-primary rounded-full animate-ping"></span>
+                                STABLE
+                            </span>
+</div>
+<div class="space-y-4">
+<div class="p-3 bg-surface-container-high rounded-xl border border-outline-variant/20">
+<div class="flex justify-between text-[12px] mb-1">
+<span class="text-on-surface">PoseEstimation-v4.2</span>
+<span class="text-primary">Active</span>
+</div>
+<p class="text-[10px] text-on-surface-variant">Running on A100 Cluster • 99.9% Up</p>
+</div>
+<div class="p-3 bg-surface-container-high rounded-xl border border-outline-variant/20">
+<div class="flex justify-between text-[12px] mb-1">
+<span class="text-on-surface">InjuryPredict-v1.0-beta</span>
+<span class="text-tertiary">Canary</span>
+</div>
+<p class="text-[10px] text-on-surface-variant">5% Traffic • Monitoring drift...</p>
+</div>
+</div>
+</div>
+<div class="glass-panel p-6 rounded-2xl relative overflow-hidden">
+
+<h3 class="font-label-caps text-label-caps text-on-surface-variant mb-4 relative z-10">Active Sessions Map</h3>
+<div class="w-full h-40 bg-surface-container-lowest rounded-xl relative z-10 flex items-center justify-center">
+<span class="material-symbols-outlined text-[48px] text-primary/30">public</span>
+<!-- Animated Map Overlay Markers -->
+<div class="absolute top-1/4 left-1/3 w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+<div class="absolute bottom-1/3 right-1/4 w-2 h-2 bg-primary rounded-full animate-pulse delay-700"></div>
+<div class="absolute top-2/3 left-1/2 w-2 h-2 bg-primary rounded-full animate-pulse delay-300"></div>
+</div>
+<div class="mt-4 flex justify-between items-center relative z-10">
+<div>
+<p class="text-[24px] font-bold text-on-surface">1,124</p>
+<p class="text-[10px] text-on-surface-variant uppercase">Concurrent Users</p>
+</div>
+<button class="text-primary font-label-caps text-[12px] flex items-center gap-1">
+                                View Map <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Exercise Library Preview -->
+<section class="space-y-6">
+<div class="flex justify-between items-center">
+<h2 class="font-headline-md text-headline-md text-on-surface">Exercise Library</h2>
+<button class="text-primary font-label-caps text-label-caps hover:underline">Browse Full Catalog</button>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Exercise Card 1 -->
+<div class="glass-panel rounded-2xl overflow-hidden group">
+<div class="h-40 relative">
+<img class="w-full h-full object-cover" data-alt="A high-quality 3D medical animation of a human musculoskeletal system performing a shoulder rotation exercise. The style is clean and clinical with teal anatomical highlights on the active muscles. Soft studio lighting and a deep slate-950 background create a premium health-tech atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBd8deGr-kew2E5mwwk8XcEOuv2I1OWVuv2fTdhpSBJcD7ioVg6jsieALkb6v7pzG3eMyAkIaeyNfIpRCvgmnNccbfwx2Il2sXwHXgHVZZxSuyM1NqTvnkMXFkFmBmL48mpwwN92ZhE23ZCjECxBYzmtgEaD6G8CFrI-YxoGxXRnQFrmm9EvnbZnWDsj9R7DKqkKxwsy9SZdET78dJ40PUBkDNfaPb_j3hKdCUtvXec9IHqBQWi3bc7YA"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-dim to-transparent"></div>
+<span class="absolute top-3 left-3 px-2 py-1 bg-primary text-on-primary text-[10px] font-bold rounded-lg">SHOULDER</span>
+</div>
+<div class="p-4">
+<h4 class="text-body-base font-bold mb-1">External Rotation</h4>
+<p class="text-[12px] text-on-surface-variant mb-4">Focus: Rotator cuff stability &amp; posture.</p>
+<div class="flex justify-between items-center">
+<div class="flex gap-2">
+<span class="px-1.5 py-0.5 bg-surface-container-high rounded text-[10px] font-mono">12 REPS</span>
+<span class="px-1.5 py-0.5 bg-surface-container-high rounded text-[10px] font-mono">3 SETS</span>
+</div>
+<button class="p-2 rounded-full hover:bg-primary/20 text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Exercise Card 2 -->
+<div class="glass-panel rounded-2xl overflow-hidden group">
+<div class="h-40 relative">
+<img class="w-full h-full object-cover" data-alt="A detailed 3D visualization showing the leg muscles engaged during a squat exercise. The rendering features glowing teal energy lines tracing the force of the movement. Dark, sleek professional environment with high-contrast clinical lighting. The aesthetic is futuristic and high-end medical software." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfxIYBqpvq-S0vZDV7Qnwv8IprryBeaxcy8zo6_4Lx9Quw_KWhW7B6W1BZTI0PIALgT84bCnZ2PlGdbX4wtlrExmrG8FPOEl2-7LkrVOfwijZh52aFAQVdSzOOZWTKHPyOrjMDpAeAJXbt-mX29UytoBwFfZuRvKXlugkuQTKbAXXJb69hoLfOsaY-eeunCgHW8ESWxRP7swCsUPRzByO2NiLIS2ptRG8hU6LynFMHs1dx8bH916kE0g"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-dim to-transparent"></div>
+<span class="absolute top-3 left-3 px-2 py-1 bg-tertiary text-on-tertiary text-[10px] font-bold rounded-lg">KNEE</span>
+</div>
+<div class="p-4">
+<h4 class="text-body-base font-bold mb-1">Bodyweight Squat</h4>
+<p class="text-[12px] text-on-surface-variant mb-4">Focus: Quad strength &amp; hip mobility.</p>
+<div class="flex justify-between items-center">
+<div class="flex gap-2">
+<span class="px-1.5 py-0.5 bg-surface-container-high rounded text-[10px] font-mono">15 REPS</span>
+<span class="px-1.5 py-0.5 bg-surface-container-high rounded text-[10px] font-mono">4 SETS</span>
+</div>
+<button class="p-2 rounded-full hover:bg-primary/20 text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Exercise Card 3 -->
+<div class="glass-panel rounded-2xl overflow-hidden group">
+<div class="h-40 relative">
+<img class="w-full h-full object-cover" data-alt="A clean 3D illustration of a spine with focus on the lumbar region. Teal glowing discs indicate correct alignment during a cat-cow stretch. The background is a dark, professional clinical setting with subtle motion blur suggesting fluid movement. The lighting is focused and premium, highlighting the anatomical precision." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4Cy37ttyaZ6jG0yIF1l53VhSN8a4FVwhCUo9avU2AbElpyBly6je-9cGcOwSd-G5ODqRYlNONWskG9gtMO6fd2Mauk4iV5OfWURTq5EYQDyMU0xJb2UA-Xslc3TwyKX1J9DEhz4G3jev2fu_agffl1Qgrf-jl3UN869NXGeKhHDHvXHBC2NQrhInpYhZ35uEvQK7vG8Ze7WER_a0spHsMcz8ZYWWABkKr8-EUtitXMxfKRuYnYBH2vw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-dim to-transparent"></div>
+<span class="absolute top-3 left-3 px-2 py-1 bg-secondary text-on-secondary text-[10px] font-bold rounded-lg">LUMBAR</span>
+</div>
+<div class="p-4">
+<h4 class="text-body-base font-bold mb-1">Cat-Cow Stretch</h4>
+<p class="text-[12px] text-on-surface-variant mb-4">Focus: Spinal flexibility &amp; core.</p>
+<div class="flex justify-between items-center">
+<div class="flex gap-2">
+<span class="px-1.5 py-0.5 bg-surface-container-high rounded text-[10px] font-mono">10 REPS</span>
+<span class="px-1.5 py-0.5 bg-surface-container-high rounded text-[10px] font-mono">2 SETS</span>
+</div>
+<button class="p-2 rounded-full hover:bg-primary/20 text-on-surface-variant hover:text-primary transition-all">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Add New Exercise Button -->
+<button class="border-2 border-dashed border-outline-variant/30 rounded-2xl flex flex-col items-center justify-center gap-3 group hover:border-primary/50 hover:bg-primary/5 transition-all">
+<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary text-[32px]">add</span>
+</div>
+<span class="font-label-caps text-on-surface-variant">Add New Exercise</span>
+</button>
+</div>
+</section>
+</div>
+</main>
+<!-- Micro-interaction Script -->
+<script>
+        document.querySelectorAll('a, button').forEach(el => {
+            el.addEventListener('mousedown', () => {
+                el.classList.add('scale-95');
+                setTimeout(() => el.classList.remove('scale-95'), 100);
+            });
+        });
+    </script>
+</body></html>

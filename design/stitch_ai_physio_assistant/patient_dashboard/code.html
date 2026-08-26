@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Physio | Patient Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#ffddb8",
+                    "on-primary": "#003731",
+                    "secondary-fixed-dim": "#bec6e0",
+                    "tertiary": "#ffb95f",
+                    "inverse-primary": "#006b5f",
+                    "surface-container-low": "#0d1c2d",
+                    "surface-container": "#122131",
+                    "surface-dim": "#051424",
+                    "surface": "#051424",
+                    "on-secondary-container": "#adb4ce",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "outline-variant": "#3c4947",
+                    "secondary-container": "#3f465c",
+                    "on-tertiary": "#472a00",
+                    "background": "#051424",
+                    "primary-fixed": "#71f8e4",
+                    "on-error-container": "#ffdad6",
+                    "on-error": "#690005",
+                    "error": "#ffb4ab",
+                    "surface-tint": "#4fdbc8",
+                    "on-secondary-fixed": "#131b2e",
+                    "secondary": "#bec6e0",
+                    "error-container": "#93000a",
+                    "on-surface-variant": "#bbcac6",
+                    "inverse-on-surface": "#233143",
+                    "surface-container-high": "#1c2b3c",
+                    "primary-fixed-dim": "#4fdbc8",
+                    "on-secondary-fixed-variant": "#3f465c",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "on-primary-container": "#00423b",
+                    "primary-container": "#14b8a6",
+                    "surface-bright": "#2c3a4c",
+                    "on-primary-fixed": "#00201c",
+                    "on-primary-fixed-variant": "#005048",
+                    "surface-container-highest": "#273647",
+                    "primary": "#4fdbc8",
+                    "outline": "#859490",
+                    "secondary-fixed": "#dae2fd",
+                    "on-tertiary-container": "#543300",
+                    "surface-variant": "#273647",
+                    "on-background": "#d4e4fa",
+                    "on-surface": "#d4e4fa",
+                    "tertiary-container": "#e49200",
+                    "on-secondary": "#283044",
+                    "surface-container-lowest": "#010f1f",
+                    "on-tertiary-fixed": "#2a1700",
+                    "inverse-surface": "#d4e4fa"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "margin-desktop": "40px",
+                    "stack-md": "24px",
+                    "container-max": "1280px",
+                    "stack-lg": "48px",
+                    "margin-mobile": "16px",
+                    "gutter": "24px",
+                    "stack-sm": "12px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Inter"],
+                    "display-lg-mobile": ["Inter"],
+                    "body-base": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "label-caps": ["JetBrains Mono"],
+                    "stat-value": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-base": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "stat-value": ["32px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(18, 33, 49, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(60, 73, 71, 0.3);
+        }
+        .teal-glow {
+            box-shadow: 0 0 20px rgba(79, 219, 200, 0.1);
+        }
+        .active-glow {
+            box-shadow: 0 0 32px rgba(79, 219, 200, 0.15);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-base antialiased">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 right-0 left-0 z-50 flex justify-between items-center px-margin-desktop h-20 bg-surface-dim/80 backdrop-blur-md border-b border-outline-variant/30">
+<div class="flex items-center gap-stack-md">
+<span class="font-headline-md text-headline-md font-bold text-primary">AI Physio</span>
+<nav class="hidden md:flex gap-8 ml-10">
+<a class="text-primary font-bold transition-colors" href="#">Dashboard</a>
+<a class="text-on-surface-variant hover:bg-surface-variant/50 transition-colors px-2 py-1 rounded" href="#">Exercises</a>
+<a class="text-on-surface-variant hover:bg-surface-variant/50 transition-colors px-2 py-1 rounded" href="#">Reports</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary transition-colors">notifications</span>
+<span class="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full"></span>
+</div>
+<div class="w-10 h-10 rounded-full border border-primary/30 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a patient for a medical dashboard profile. The lighting is soft and neutral, with a clean clinical background in soft grays. The image style is high-definition photography with a slight teal color grade to match the dark health-tech UI theme. The patient appears healthy and focused." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6uz09Ymluj1oKROYYEFf4v73rtdGzpPFxTS5hLwZgqKGX2qyB2grEiqXB2r0rSahTt2vdmkm6uOgr-OMQUIxYo7L00Jn8P8FQL0Yvsjl9JX6jf4jTxks3rzYsW3o0lTznASA7y5RsZZ0MxA6NN_nBOnJeS7OHmN4cXihkuG4FOEHhzWzmoXwUBCUsTwo_bnIr0eQWhnSe85QTHjDy0uuA8PLapSTP9HyF4_oWGv0nJjYqisSuwo_8pA"/>
+</div>
+</div>
+</header>
+<!-- Sidebar Navigation (Desktop) -->
+<aside class="fixed left-0 top-0 bottom-0 hidden lg:flex flex-col py-stack-md w-64 z-40 bg-surface-container border-r border-outline-variant/20 pt-24">
+<div class="px-6 mb-8">
+<h3 class="text-on-surface font-bold">Patient Portal</h3>
+<p class="text-on-surface-variant text-sm">Active Treatment Plan</p>
+</div>
+<nav class="flex-1 px-4 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-primary border-r-4 border-primary bg-primary/10 translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-caps text-label-caps">DASHBOARD</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">fitness_center</span>
+<span class="font-label-caps text-label-caps">EXERCISES</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="font-label-caps text-label-caps">ANALYTICS</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">description</span>
+<span class="font-label-caps text-label-caps">REPORTS</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 transition-all duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps">SETTINGS</span>
+</a>
+</nav>
+<div class="p-4">
+<button class="w-full py-4 bg-primary text-on-primary font-bold rounded-full hover:scale-105 active:scale-95 transition-all teal-glow">
+                Start Session
+            </button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="lg:ml-64 pt-24 px-6 md:px-margin-desktop pb-20">
+<!-- Welcome Hero -->
+<section class="mb-stack-lg relative overflow-hidden rounded-[2rem] p-8 md:p-12 glass-card active-glow">
+
+<div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+<div>
+<h1 class="font-display-lg text-display-lg-mobile md:text-display-lg mb-2">Welcome back, Alex</h1>
+<p class="text-on-surface-variant text-lg max-w-md">You're making excellent progress on your ACL recovery. Ready for your morning session?</p>
+</div>
+<button class="group flex items-center gap-3 px-8 py-5 bg-primary text-on-primary font-bold rounded-full hover:shadow-[0_0_30px_rgba(79,219,200,0.4)] transition-all transform hover:-translate-y-1">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_circle</span>
+<span class="text-xl">Start Live Session</span>
+</button>
+</div>
+</section>
+<!-- Stat Tiles -->
+<section class="grid grid-cols-2 md:grid-cols-4 gap-gutter mb-stack-lg">
+<div class="glass-card p-6 rounded-2xl border-l-4 border-primary">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-2">SESSIONS COMPLETED</p>
+<div class="flex items-end gap-2">
+<span class="font-stat-value text-stat-value text-primary">12</span>
+<span class="text-on-surface-variant text-sm mb-1">/ 24 total</span>
+</div>
+<div class="mt-4 h-1 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary w-1/2"></div>
+</div>
+</div>
+<div class="glass-card p-6 rounded-2xl">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-2">TOTAL REPS</p>
+<span class="font-stat-value text-stat-value">450</span>
+<div class="flex items-center gap-1 text-primary text-xs mt-2">
+<span class="material-symbols-outlined text-xs">trending_up</span>
+<span>+12% this week</span>
+</div>
+</div>
+<div class="glass-card p-6 rounded-2xl">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-2">CURRENT ACCURACY</p>
+<span class="font-stat-value text-stat-value text-primary">94%</span>
+<div class="mt-4 flex gap-1">
+<div class="h-1 w-full bg-primary/20 rounded-full"><div class="h-full bg-primary w-[94%]"></div></div>
+</div>
+</div>
+<div class="glass-card p-6 rounded-2xl">
+<p class="font-label-caps text-label-caps text-on-surface-variant mb-2">RECOVERY STREAK</p>
+<div class="flex items-center gap-2">
+<span class="font-stat-value text-stat-value">5</span>
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+</div>
+<p class="text-on-surface-variant text-xs mt-2">Days active</p>
+</div>
+</section>
+<!-- Main Dashboard Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<!-- Left Column: Current Plan & Feedback -->
+<div class="lg:col-span-2 space-y-gutter">
+<!-- Current Exercise Plan -->
+<div class="glass-card p-8 rounded-3xl relative overflow-hidden">
+<div class="absolute top-0 right-0 p-4">
+<span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-bold border border-primary/20">WEEK 3</span>
+</div>
+<h2 class="font-headline-md text-headline-md mb-6">Current Plan: ACL Recovery</h2>
+<div class="flex flex-col md:flex-row gap-8 items-center">
+<div class="relative w-32 h-32">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-surface-variant" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-primary" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-dasharray="364" stroke-dashoffset="145" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="font-bold text-2xl">60%</span>
+<span class="text-[10px] text-on-surface-variant">PLAN PROGRESS</span>
+</div>
+</div>
+<div class="flex-1 space-y-4">
+<div class="flex justify-between items-center">
+<span class="text-on-surface">Range of Motion Goals</span>
+<span class="text-primary font-mono text-sm">115° / 125°</span>
+</div>
+<div class="h-2 w-full bg-surface-variant rounded-full">
+<div class="h-full bg-primary w-[85%] rounded-full"></div>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-on-surface">Daily Exercises</span>
+<span class="text-on-surface-variant text-sm">3 of 5 completed</span>
+</div>
+<div class="h-2 w-full bg-surface-variant rounded-full">
+<div class="h-full bg-primary/40 w-[60%] rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent AI Feedback -->
+<div class="bg-surface-container-highest p-8 rounded-3xl border border-primary/20 relative">
+<div class="flex items-start gap-4">
+<div class="bg-primary/20 p-3 rounded-2xl">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">psychology</span>
+</div>
+<div>
+<h3 class="font-bold text-lg mb-2">Recent AI Insights</h3>
+<p class="text-on-surface text-lg leading-relaxed italic">
+                                "Your knee extension is improving; try to hold the peak for 1s longer to maximize quadricep engagement. Your form stability is up 4%."
+                            </p>
+<div class="mt-6 flex gap-3">
+<span class="bg-surface-variant px-3 py-1 rounded-full text-xs">Strength Training</span>
+<span class="bg-surface-variant px-3 py-1 rounded-full text-xs">Mobility Focus</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Recovery Stage Timeline -->
+<div class="glass-card p-8 rounded-3xl">
+<h3 class="font-headline-md text-headline-md mb-8">Recovery Journey</h3>
+<div class="relative pt-10 pb-4">
+<div class="absolute top-1/2 left-0 w-full h-1 bg-surface-variant -translate-y-1/2 rounded-full"></div>
+<div class="absolute top-1/2 left-0 w-3/5 h-1 bg-primary -translate-y-1/2 rounded-full shadow-[0_0_10px_rgba(79,219,200,0.5)]"></div>
+<div class="relative flex justify-between">
+<div class="flex flex-col items-center">
+<div class="w-4 h-4 bg-primary rounded-full relative z-10 border-4 border-background mb-2"></div>
+<span class="text-[10px] font-label-caps text-primary">POST-OP</span>
+</div>
+<div class="flex flex-col items-center">
+<div class="w-4 h-4 bg-primary rounded-full relative z-10 border-4 border-background mb-2"></div>
+<span class="text-[10px] font-label-caps text-primary">MOBILITY</span>
+</div>
+<div class="flex flex-col items-center">
+<div class="w-6 h-6 bg-primary rounded-full relative z-10 border-4 border-background -mt-1 mb-1 active-glow"></div>
+<span class="text-[10px] font-label-caps text-primary font-bold">STRENGTH</span>
+</div>
+<div class="flex flex-col items-center">
+<div class="w-4 h-4 bg-surface-variant rounded-full relative z-10 border-4 border-background mb-2"></div>
+<span class="text-[10px] font-label-caps text-on-surface-variant">RUNNING</span>
+</div>
+<div class="flex flex-col items-center">
+<div class="w-4 h-4 bg-surface-variant rounded-full relative z-10 border-4 border-background mb-2"></div>
+<span class="text-[10px] font-label-caps text-on-surface-variant">RE-ENTRY</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Recommended Exercises -->
+<div class="lg:col-span-1 space-y-gutter">
+<div class="glass-card p-6 rounded-3xl h-full">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-bold text-xl">Daily Lineup</h3>
+<a class="text-primary text-sm font-semibold hover:underline" href="#">View All</a>
+</div>
+<div class="space-y-4">
+<!-- Exercise Card 1 -->
+<div class="group relative bg-surface-container rounded-2xl p-3 border border-outline-variant/20 hover:border-primary/50 transition-all cursor-pointer">
+<div class="flex gap-4">
+<div class="w-20 h-20 rounded-xl overflow-hidden bg-surface-bright flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A clean, cinematic overhead shot of a physical therapy session focusing on knee quad sets. The scene is well-lit with cool studio lighting, emphasizing the muscle definition. High-end medical tech aesthetic with dark teal tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCV77jT7nKEW7jxyMA8bmUFqTS23v8fYMlnUDHfwMWYWs3v0jNYNVO7yV5jEkJP28X_RJxI_UgaYkvPumrPZn5aPo9VKVu5-I3YJcYCyuLo4FZrAVEFn_o3lQYlzLsbOK1SuAYOmFogi5Ah_1a6OvNaxqF-s5oP557-GUhdztoZtlncv-QdT7qhiEGRa_GyELCNI9Bte1NHpqOMY8vrdc78ja6D223uKkoJjPAvNK17Aets-i-G7tAHSA"/>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-on-surface">Quad Sets</h4>
+<p class="text-on-surface-variant text-xs mb-2">15 Reps • 3 Sets</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="text-[10px] text-primary uppercase font-bold">Completed</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Exercise Card 2 -->
+<div class="group relative bg-surface-container rounded-2xl p-3 border border-outline-variant/20 hover:border-primary/50 transition-all cursor-pointer">
+<div class="flex gap-4">
+<div class="w-20 h-20 rounded-xl overflow-hidden bg-surface-bright flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A clinical photograph of a patient performing heel slides against a dark background. The lighting highlights the range of motion of the knee. Subtle teal glowing indicators suggest AI motion tracking. Modern health-tech visual style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkwxOTf6Di8SvC5LipWtRRm4w_Qx9Na9sVUfRb_voh41K1eeiCIvjhIcLXyz57bDpBDUaRxD_mWx9nQApP4j6KEIatKs0WZ1ndRRPvemVa381ymJ4tbuAyEJGF4Elj7nD0hcHbemvAvZjy2seB_W667bOYcTzjwbbKO0NWgu2gqTnQSr2stQqPXz39zPdtJCC9hX3Xqyxm-UvACwhX_f-XiyDwseuzP1s--rkimbnuUqhxKGNxA5-UVw"/>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-on-surface">Heel Slides</h4>
+<p class="text-on-surface-variant text-xs mb-2">10 Reps • 2 Sets</p>
+<div class="flex items-center gap-2">
+<div class="flex-1 h-1 bg-surface-variant rounded-full">
+<div class="h-full bg-primary w-1/2 rounded-full"></div>
+</div>
+<span class="text-[10px] text-on-surface-variant">5/10</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Exercise Card 3 -->
+<div class="group relative bg-surface-container-high rounded-2xl p-3 border border-outline-variant/20 hover:border-primary/50 transition-all cursor-pointer">
+<div class="flex gap-4">
+<div class="w-20 h-20 rounded-xl overflow-hidden bg-surface-bright flex-shrink-0 relative">
+<div class="absolute inset-0 bg-black/40 flex items-center justify-center z-10">
+<span class="material-symbols-outlined text-white">lock</span>
+</div>
+<img class="w-full h-full object-cover" data-alt="A focused image of a physical therapist guiding a patient's leg into a straight leg raise. The environment is a futuristic, minimal clinic with dark slate walls and soft teal accent lights. High resolution, professional medical photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAX8VoX4fzmxXSUP7L5zjVxKY9koVsH0Gm3T4QaYN0tgbZBSHCsSwuhrWLfzlg-XnEXRK5iebiW20nIBInt6qNHu7r6PAaEqdBMbAGBAB63jHRe-PoC_CS0c_iX9YzAOqHSWEINDlCWoE2UkpjVltnFZ0f5FoGBKNnUING-HgGIn-lXwXHIOGd_ahqg43G5YVcsAj02UPirbjGZ6nwrI9S_ISn9-MSP4dMb4kqiULUb87Gg0r8rsEih5w"/>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-on-surface">Straight Leg Raise</h4>
+<p class="text-on-surface-variant text-xs mb-2">Next up</p>
+<span class="bg-surface-variant px-2 py-0.5 rounded text-[10px] text-on-surface-variant">Recommended</span>
+</div>
+</div>
+</div>
+</div>
+<div class="mt-8 p-4 bg-primary/5 rounded-2xl border border-primary/20">
+<p class="text-xs text-primary font-bold uppercase mb-2">Did you know?</p>
+<p class="text-sm text-on-surface-variant">Keeping a consistent streak increases recovery speed by up to 30%.</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-surface-dim/95 backdrop-blur-lg flex justify-around items-center z-50">
+<a class="text-primary flex flex-col items-center" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="text-[10px] font-label-caps">HOME</span>
+</a>
+<a class="text-on-surface-variant flex flex-col items-center" href="#">
+<span class="material-symbols-outlined">fitness_center</span>
+<span class="text-[10px] font-label-caps">WORKOUT</span>
+</a>
+<div class="bg-primary p-3 rounded-full -mt-8 shadow-lg border-4 border-background">
+<span class="material-symbols-outlined text-on-primary">play_arrow</span>
+</div>
+<a class="text-on-surface-variant flex flex-col items-center" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="text-[10px] font-label-caps">STATS</span>
+</a>
+<a class="text-on-surface-variant flex flex-col items-center" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-label-caps">PROFILE</span>
+</a>
+</nav>
+<script>
+        // Micro-interactions and atmospheric logic
+        document.addEventListener('DOMContentLoaded', () => {
+            // Hover effect for stat tiles
+            const tiles = document.querySelectorAll('.glass-card');
+            tiles.forEach(tile => {
+                tile.addEventListener('mouseenter', () => {
+                    tile.classList.add('teal-glow');
+                });
+                tile.addEventListener('mouseleave', () => {
+                    if (!tile.classList.contains('active-glow')) {
+                        tile.classList.remove('teal-glow');
+                    }
+                });
+            });
+
+            // Intersection Observer for fade-in animations
+            const observerOptions = {
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('opacity-100', 'translate-y-0');
+                        entry.target.classList.remove('opacity-0', 'translate-y-4');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('section, .glass-card').forEach(el => {
+                el.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-y-4');
+                observer.observe(el);
+            });
+        });
+    </script>
+</body></html>

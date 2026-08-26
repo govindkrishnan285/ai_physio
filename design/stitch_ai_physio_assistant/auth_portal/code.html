@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Physio | Auth Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Shared Component Config Hierarchy -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-fixed": "#ffddb8",
+                    "on-primary": "#003731",
+                    "secondary-fixed-dim": "#bec6e0",
+                    "tertiary": "#ffb95f",
+                    "inverse-primary": "#006b5f",
+                    "surface-container-low": "#0d1c2d",
+                    "surface-container": "#122131",
+                    "surface-dim": "#051424",
+                    "surface": "#051424",
+                    "on-secondary-container": "#adb4ce",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "outline-variant": "#3c4947",
+                    "secondary-container": "#3f465c",
+                    "on-tertiary": "#472a00",
+                    "background": "#051424",
+                    "primary-fixed": "#71f8e4",
+                    "on-error-container": "#ffdad6",
+                    "on-error": "#690005",
+                    "error": "#ffb4ab",
+                    "surface-tint": "#4fdbc8",
+                    "on-secondary-fixed": "#131b2e",
+                    "secondary": "#bec6e0",
+                    "error-container": "#93000a",
+                    "on-surface-variant": "#bbcac6",
+                    "inverse-on-surface": "#233143",
+                    "surface-container-high": "#1c2b3c",
+                    "primary-fixed-dim": "#4fdbc8",
+                    "on-secondary-fixed-variant": "#3f465c",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "on-primary-container": "#00423b",
+                    "primary-container": "#14b8a6",
+                    "surface-bright": "#2c3a4c",
+                    "on-primary-fixed": "#00201c",
+                    "on-primary-fixed-variant": "#005048",
+                    "surface-container-highest": "#273647",
+                    "primary": "#4fdbc8",
+                    "outline": "#859490",
+                    "secondary-fixed": "#dae2fd",
+                    "on-tertiary-container": "#543300",
+                    "surface-variant": "#273647",
+                    "on-background": "#d4e4fa",
+                    "on-surface": "#d4e4fa",
+                    "tertiary-container": "#e49200",
+                    "on-secondary": "#283044",
+                    "surface-container-lowest": "#010f1f",
+                    "on-tertiary-fixed": "#2a1700",
+                    "inverse-surface": "#d4e4fa"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "margin-desktop": "40px",
+                    "stack-md": "24px",
+                    "container-max": "1280px",
+                    "stack-lg": "48px",
+                    "margin-mobile": "16px",
+                    "gutter": "24px",
+                    "stack-sm": "12px"
+            },
+            "fontFamily": {
+                    "headline-md": ["Inter"],
+                    "display-lg-mobile": ["Inter"],
+                    "body-base": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "label-caps": ["JetBrains Mono"],
+                    "stat-value": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-base": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "stat-value": ["32px", {"lineHeight": "32px", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      body {
+        background-color: #051424; /* surface-dim fallback */
+        overflow-x: hidden;
+      }
+      .glass-card {
+        background: rgba(18, 33, 49, 0.8);
+        backdrop-filter: blur(24px);
+        border: 1px solid rgba(60, 73, 71, 0.5);
+      }
+      .teal-glow {
+        filter: blur(80px);
+        background: radial-gradient(circle, rgba(79, 219, 200, 0.15) 0%, rgba(79, 219, 200, 0) 70%);
+      }
+      .custom-radio:checked + label {
+        @apply bg-primary/10 border-primary text-primary;
+      }
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+    </style>
+</head>
+<body class="font-body-base text-on-surface flex items-center justify-center min-h-screen relative px-margin-mobile md:px-0">
+<!-- Atmospheric Background Effects -->
+<div class="fixed inset-0 z-0">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] teal-glow rounded-full"></div>
+
+</div>
+<!-- Auth Container -->
+<main class="relative z-10 w-full max-w-[480px]">
+<!-- Branding Header -->
+<header class="text-center mb-stack-lg">
+<h1 class="font-headline-md text-headline-md font-bold text-primary mb-unit">AI Physio</h1>
+<p class="font-label-caps text-label-caps text-on-surface-variant tracking-widest uppercase">Clinical Excellence · Human Warmth</p>
+</header>
+<!-- Glass Auth Card -->
+<div class="glass-card rounded-xl p-8 shadow-2xl relative overflow-hidden">
+<!-- Tab Switcher -->
+<div class="flex border-b border-outline-variant/30 mb-stack-md">
+<button class="flex-1 py-4 text-center font-label-caps text-label-caps transition-all duration-300 border-b-2 border-primary text-primary" id="loginTabBtn" onclick="switchTab('login')">
+                    Login
+                </button>
+<button class="flex-1 py-4 text-center font-label-caps text-label-caps transition-all duration-300 border-b-2 border-transparent text-on-surface-variant hover:text-on-surface" id="registerTabBtn" onclick="switchTab('register')">
+                    Register
+                </button>
+</div>
+<!-- Login Form -->
+<form class="space-y-stack-md block" id="loginForm">
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant block">Email Address</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">mail</span>
+<input class="w-full bg-surface-container-low border border-outline-variant/50 rounded-lg py-3 pl-12 pr-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-outline/50" placeholder="name@example.com" type="email"/>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<label class="font-label-caps text-label-caps text-on-surface-variant block">Password</label>
+<a class="text-[11px] font-label-caps text-primary hover:underline" href="#">Forgot Password?</a>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">lock</span>
+<input class="w-full bg-surface-container-low border border-outline-variant/50 rounded-lg py-3 pl-12 pr-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all placeholder:text-outline/50" placeholder="••••••••" type="password"/>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary font-bold py-4 rounded-full hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-primary/20 mt-4" type="submit">
+                    Sign In
+                </button>
+<div class="text-center">
+<a class="text-[12px] font-label-caps text-on-surface-variant hover:text-primary transition-colors" href="#">Resend Email Verification</a>
+</div>
+</form>
+<!-- Register Form (Hidden by Default) -->
+<form class="space-y-stack-md hidden" id="registerForm">
+<div class="grid grid-cols-3 gap-2 p-1 bg-surface-container-low rounded-lg border border-outline-variant/30">
+<input checked="" class="hidden custom-radio" id="role-patient" name="role" type="radio" value="patient"/>
+<label class="cursor-pointer text-center py-2 px-1 rounded-md font-label-caps text-[10px] transition-all border border-transparent text-on-surface-variant" for="role-patient">
+                        Patient
+                    </label>
+<input class="hidden custom-radio" id="role-physio" name="role" type="radio" value="physiotherapist"/>
+<label class="cursor-pointer text-center py-2 px-1 rounded-md font-label-caps text-[10px] transition-all border border-transparent text-on-surface-variant" for="role-physio">
+                        Physio
+                    </label>
+<input class="hidden custom-radio" id="role-admin" name="role" type="radio" value="admin"/>
+<label class="cursor-pointer text-center py-2 px-1 rounded-md font-label-caps text-[10px] transition-all border border-transparent text-on-surface-variant" for="role-admin">
+                        Admin
+                    </label>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant block">Email Address</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">mail</span>
+<input class="w-full bg-surface-container-low border border-outline-variant/50 rounded-lg py-3 pl-12 pr-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="name@example.com" type="email"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant block">Create Password</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">lock</span>
+<input class="w-full bg-surface-container-low border border-outline-variant/50 rounded-lg py-3 pl-12 pr-4 text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="••••••••" type="password"/>
+</div>
+</div>
+<button class="w-full border-2 border-primary text-primary font-bold py-4 rounded-full hover:bg-primary/10 active:scale-95 transition-all mt-4" type="submit">
+                    Create Account
+                </button>
+</form>
+<!-- Decorative Accents -->
+<div class="absolute -bottom-4 -right-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl"></div>
+<div class="absolute -top-4 -left-4 w-16 h-16 bg-primary/10 rounded-full blur-xl"></div>
+</div>
+<!-- Secondary Info -->
+<footer class="mt-stack-md text-center">
+<p class="text-[13px] text-on-surface-variant">
+                By continuing, you agree to AI Physio's 
+                <a class="text-primary hover:underline" href="#">Terms of Service</a> &amp; 
+                <a class="text-primary hover:underline" href="#">Privacy Policy</a>
+</p>
+</footer>
+</main>
+<script>
+        function switchTab(tab) {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const loginBtn = document.getElementById('loginTabBtn');
+            const registerBtn = document.getElementById('registerTabBtn');
+
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                loginForm.classList.add('block');
+                registerForm.classList.remove('block');
+                registerForm.classList.add('hidden');
+                
+                loginBtn.classList.add('border-primary', 'text-primary');
+                loginBtn.classList.remove('border-transparent', 'text-on-surface-variant');
+                
+                registerBtn.classList.remove('border-primary', 'text-primary');
+                registerBtn.classList.add('border-transparent', 'text-on-surface-variant');
+            } else {
+                loginForm.classList.remove('block');
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                registerForm.classList.add('block');
+                
+                registerBtn.classList.add('border-primary', 'text-primary');
+                registerBtn.classList.remove('border-transparent', 'text-on-surface-variant');
+                
+                loginBtn.classList.remove('border-primary', 'text-primary');
+                loginBtn.classList.add('border-transparent', 'text-on-surface-variant');
+            }
+        }
+
+        // Simple scale effect on mouse move for the glow
+        document.addEventListener('mousemove', (e) => {
+            const glow = document.querySelector('.teal-glow');
+            const x = (e.clientX / window.innerWidth - 0.5) * 40;
+            const y = (e.clientY / window.innerHeight - 0.5) * 40;
+            glow.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+        });
+    </script>
+</body></html>
