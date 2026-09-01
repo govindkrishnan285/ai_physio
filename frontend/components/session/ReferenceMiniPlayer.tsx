@@ -8,6 +8,13 @@ import { api, ReferenceVideo } from "@/lib/api";
 
 const SPEEDS = [0.5, 0.75, 1, 1.25];
 
+function fmt(sec: number): string {
+  if (!Number.isFinite(sec) || sec < 0) sec = 0;
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
 /**
  * Side-by-side reference exercise clip.
  *
@@ -24,7 +31,27 @@ export default function ReferenceMiniPlayer() {
   const [ref, setRef] = useState<ReferenceVideo | null>(null);
   const [speed, setSpeed] = useState(1);
   const [playing, setPlaying] = useState(true); // user's will; autoplays muted
+  const [pos, setPos] = useState(0); // seconds into the trained window
+  const [winDur, setWinDur] = useState(0); // length of the trained window
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // The trained movement window bounds, resolving a null end to the clip end.
+  function windowBounds() {
+    const v = videoRef.current;
+    const s = ref?.start_sec ?? 0;
+    const e = ref?.end_sec ?? (v?.duration ?? 0);
+    return { s, e };
+  }
+
+  // Seek to an offset (seconds) inside the trained window.
+  function seekTo(offset: number) {
+    const v = videoRef.current;
+    if (!v) return;
+    const { s, e } = windowBounds();
+    const clamped = Math.max(0, Math.min(offset, Math.max(0, e - s)));
+    v.currentTime = s + clamped;
+    setPos(clamped);
+  }
 
   // Fetch the reference clip whenever the exercise changes.
   useEffect(() => {
@@ -86,7 +113,10 @@ export default function ReferenceMiniPlayer() {
           playsInline
           preload="auto"
           onLoadedMetadata={() => {
-            if (videoRef.current) videoRef.current.currentTime = start;
+            const v = videoRef.current;
+            if (!v) return;
+            v.currentTime = start;
+            setWinDur(Math.max(0, (end ?? v.duration) - start));
           }}
           onTimeUpdate={() => {
             const v = videoRef.current;
@@ -96,6 +126,7 @@ export default function ReferenceMiniPlayer() {
             if (v.currentTime >= stop || v.currentTime < start - 0.1) {
               v.currentTime = start;
             }
+            setPos(Math.max(0, v.currentTime - start));
           }}
           onClick={() => setPlaying((p) => !p)}
           className="absolute inset-0 h-full w-full cursor-pointer object-contain"
@@ -109,7 +140,27 @@ export default function ReferenceMiniPlayer() {
         )}
       </div>
 
-      <div className="flex items-center gap-1 border-t border-slate-800 px-3 py-2">
+      {/* Scrub bar — drag to move to any point in the movement. */}
+      <div className="flex items-center gap-2 border-t border-slate-800 px-3 pt-2">
+        <span className="w-8 shrink-0 text-right font-mono text-[10px] text-slate-400">
+          {fmt(pos)}
+        </span>
+        <input
+          type="range"
+          min={0}
+          max={winDur || 0}
+          step={0.05}
+          value={Math.min(pos, winDur || 0)}
+          onChange={(e) => seekTo(Number(e.target.value))}
+          aria-label="Seek reference video"
+          className="h-1 flex-1 cursor-pointer appearance-none rounded-full bg-slate-700 accent-teal-500"
+        />
+        <span className="w-8 shrink-0 font-mono text-[10px] text-slate-500">
+          {fmt(winDur)}
+        </span>
+      </div>
+
+      <div className="flex items-center gap-1 px-3 pb-2 pt-1.5">
         {/* Play / pause is the user's control — independent of the session. */}
         <button
           onClick={() => setPlaying((p) => !p)}
