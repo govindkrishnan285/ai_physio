@@ -50,6 +50,13 @@ def download_video(url: str, dest_dir: Path) -> Path:
         "noplaylist": True,
         "retries": 3,
         "fragment_retries": 3,
+        # YouTube's default `web` client is increasingly blocked — its media
+        # URLs 403 or report "format not available". The mobile/tv clients
+        # still serve progressive formats, so try them first and fall back to
+        # web. yt-dlp uses the first client that yields a usable format.
+        "extractor_args": {
+            "youtube": {"player_client": ["android", "ios", "tv", "web"]}
+        },
         # Optionally reuse the user's YouTube session for restricted videos:
         #   export YTDLP_COOKIES_FROM_BROWSER=chrome
         **_js_runtime(),
